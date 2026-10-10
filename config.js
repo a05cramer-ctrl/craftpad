@@ -5,10 +5,10 @@
 window.CRAFT_CFG = {
   NAME: "CraftPad",
   TICKER: "CRAFT",
-  CA: "",
+  CA: "CfDwWoEF35SaXDmHRmLTSdQUz5VcHYskqkD9g8cppump",
   CHAIN: "solana",
   PAD: "pumpfun",
-  X: "",
+  X: "https://x.com/usecraftpads",
   BUY: "",
   CHART: "",
   LOGO:"logo.png",
