@@ -1,0 +1,1331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CraftPad ($CRAFT)</title><meta property="og:title" content="CraftPad"><meta property="og:description" content="Every Minecraft server gets a coin. Its creator fees pay the hosting."><meta property="og:image" content="og.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="og.jpg">
+<meta name="description" content="Paste any Minecraft-style server IP. Its coin's creator fees fill a vault that pays the server's hosting. The launcher can't touch them.">
+<meta name="theme-color" content="#121212">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen:wght@400;700&family=Rubik:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+<link rel="icon" id="favicon" href="data:,">
+<style>
+:root{
+  --grass:#5DBB3F;--grass-d:#3E8A2A;--grass-l:#7ED957;--grass-xd:#2C6A1D;
+  --dirt:#8B5A2B;--dirt-d:#5C3A1E;--dirt-l:#9C6A35;
+  --stone:#8A8D91;--stone-d:#5F6266;--stone-l:#A4A7AB;
+  --sky:#8FD3FF;--sky-d:#5FB8F5;--gold:#FFD24A;--gold-d:#C9971A;--gold-l:#FFF1A8;
+  --ink:#121212;--panel:#121212;--panel-2:#1C1D21;--panel-3:#26282D;
+  --text:#F4F1E8;--muted:#A6A49C;--red:#FF5A4E;--led:#5DFF6A;--amber:#FFB627;
+  --px:4px;
+  --f-pixel:"Pixelify Sans",ui-monospace,monospace;
+  --f-mono:"VT323",ui-monospace,monospace;
+  --f-ui:"Silkscreen",ui-monospace,monospace;
+  --f-body:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+[hidden]{display:none!important}
+*,*::before,*::after{box-sizing:border-box}
+html,body{overflow-x:clip}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:#2a1b0f;color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+img,canvas,svg{display:block;max-width:100%}
+.pix{image-rendering:pixelated;image-rendering:crisp-edges}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.wrap{width:100%;max-width:1220px;margin:0 auto;padding:0 32px}
+@media (max-width:640px){.wrap{padding:0 16px}}
+
+/* ---------- pixel primitives ---------- */
+.px{position:relative;background:var(--panel);color:var(--text);
+  box-shadow:inset 4px 4px 0 rgba(255,255,255,.12),inset -4px -4px 0 rgba(0,0,0,.55),0 0 0 4px #000,8px 8px 0 4px rgba(0,0,0,.28)}
+.px-2{background:var(--panel-2)}
+.lbl{font-family:var(--f-mono);font-size:19px;line-height:1;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:19px;line-height:1;letter-spacing:.06em;padding:6px 10px 5px;background:#000;color:var(--text);box-shadow:inset 2px 2px 0 rgba(255,255,255,.14),inset -2px -2px 0 rgba(0,0,0,.6)}
+.tag-gold{background:var(--gold);color:var(--ink);box-shadow:inset 2px 2px 0 var(--gold-l),inset -2px -2px 0 var(--gold-d)}
+.tag-green{background:var(--grass);color:var(--ink);box-shadow:inset 2px 2px 0 var(--grass-l),inset -2px -2px 0 var(--grass-d)}
+.tag-red{background:var(--red);color:var(--ink)}
+.tag .dot{width:8px;height:8px;background:currentColor}
+.blink{animation:blink 1s steps(2,end) infinite}
+@keyframes blink{50%{opacity:.15}}
+
+.btn{--bg:var(--gold);--hi:var(--gold-l);--lo:var(--gold-d);--fg:var(--ink);
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border:0;cursor:pointer;
+  font-family:var(--f-ui);font-weight:700;font-size:16px;letter-spacing:.02em;text-transform:uppercase;text-decoration:none;white-space:nowrap;
+  background:var(--bg);color:var(--fg);
+  box-shadow:inset 4px 4px 0 var(--hi),inset -4px -4px 0 var(--lo),0 0 0 3px #000,0 6px 0 3px #000;
+  transform:translateY(0);transition:transform .12s steps(2),box-shadow .12s steps(2)}
+.btn:hover{transform:translateY(-3px);box-shadow:inset 4px 4px 0 var(--hi),inset -4px -4px 0 var(--lo),0 0 0 3px #000,0 9px 0 3px #000}
+.btn:active{transform:translateY(4px);box-shadow:inset 4px 4px 0 var(--lo),inset -4px -4px 0 var(--hi),0 0 0 3px #000,0 2px 0 3px #000}
+.btn-green{--bg:var(--grass);--hi:var(--grass-l);--lo:var(--grass-d);--fg:#0d1a08}
+.btn-dark{--bg:#2E3036;--hi:#4A4D55;--lo:#16171A;--fg:var(--text)}
+.btn-stone{--bg:var(--stone);--hi:var(--stone-l);--lo:var(--stone-d);--fg:var(--ink)}
+.btn-sm{min-height:44px;padding:0 14px;font-size:14px}
+.btn-block{width:100%}
+.btn[aria-disabled="true"]{--bg:#1d1e22;--hi:#2c2e33;--lo:#0f1012;--fg:var(--gold);cursor:default;
+  background-image:repeating-linear-gradient(135deg,rgba(255,210,74,.08) 0 6px,transparent 6px 12px)}
+.btn[aria-disabled="true"]:hover{transform:none}
+.btn svg{width:20px;height:20px}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:50;background:var(--ink);box-shadow:0 4px 0 #000,inset 0 -4px 0 #000}
+.nav::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:4px;background:var(--grass-d)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:68px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-height:44px}
+.brand .mark{width:40px;height:44px}
+.brand-word{font-family:var(--f-ui);font-weight:700;font-size:20px;letter-spacing:.02em;line-height:1}
+.brand-word span{color:var(--gold)}
+.nav-links{display:flex;gap:2px;margin-left:auto}
+.nav-links a{font-family:var(--f-mono);font-size:21px;letter-spacing:.05em;text-decoration:none;color:#cfcbbf;padding:0 12px;min-height:44px;display:flex;align-items:center}
+.nav-links a:hover{color:var(--gold);background:#1f2024}
+.nav-right{display:flex;gap:14px;align-items:center}
+.snd{width:48px;height:44px;border:0;background:#1f2024;cursor:pointer;display:grid;place-items:center;box-shadow:inset 2px 2px 0 rgba(255,255,255,.1),inset -2px -2px 0 #000}
+.snd svg{width:24px;height:24px}
+.snd[aria-pressed="true"]{background:var(--grass-d)}
+@media (max-width:980px){.nav-links{display:none}.nav-right{margin-left:auto}}
+@media (max-width:420px){.brand-word{font-size:16px}.nav .btn{padding:0 12px;font-size:13px}.brand .mark{width:34px}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:var(--sky);color:var(--ink);overflow:hidden;padding:64px 0 0}
+#sky{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero-in{position:relative;z-index:2}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"copy rack" "result result";column-gap:48px;row-gap:40px;align-items:start}
+.hero-copy{grid-area:copy;padding-top:8px}
+.hero-rack{grid-area:rack;align-self:center}
+.result{grid-area:result}
+.wordmark{font-family:var(--f-ui);font-weight:700;font-size:clamp(44px,5.4vw,74px);line-height:.95;letter-spacing:0;margin:0 0 30px;color:#fff;
+  text-shadow:.07em .07em 0 var(--ink)}
+.wordmark span{color:var(--gold)}
+.eyebrow{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px}
+.wordmark .ticker{font-weight:400;display:inline-block;vertical-align:top;margin-left:14px;margin-top:6px;font-family:var(--f-mono);font-size:22px;letter-spacing:.06em;text-shadow:none;color:var(--ink);background:#fff;padding:5px 10px 3px;box-shadow:0 0 0 3px var(--ink),4px 4px 0 3px var(--ink)}
+.h1{font-family:var(--f-pixel);font-weight:700;font-size:clamp(34px,3.7vw,50px);line-height:1.06;letter-spacing:-.005em;margin:0 0 18px;text-wrap:balance}
+.h1 span{display:block}
+.h1 .l2{color:var(--grass-xd)}
+.sub{font-size:19px;line-height:1.5;max-width:560px;margin:0 0 28px;color:#13283a}
+.sub b{font-weight:700}
+.ipform{display:flex;align-items:stretch;gap:0;max-width:600px;background:var(--ink);padding:8px;
+  box-shadow:inset 4px 4px 0 rgba(255,255,255,.12),inset -4px -4px 0 rgba(0,0,0,.55),0 0 0 4px #000,8px 8px 0 4px rgba(0,0,0,.22)}
+.ipform label{display:flex;align-items:center;padding:0 12px 0 10px;font-family:var(--f-mono);font-size:24px;color:var(--grass-l);white-space:nowrap}
+.ipform input{flex:1;min-width:0;height:60px;border:0;background:#060606;color:#fff;font-family:var(--f-mono);font-size:28px;letter-spacing:.02em;padding:0 14px;
+  box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #2a2b30}
+.ipform input::placeholder{color:#5d5d5d}
+.ipform input:focus{outline:none;box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #2a2b30,0 0 0 3px var(--gold)}
+.ipform .btn{min-height:60px;margin-left:10px;font-size:18px;box-shadow:inset 4px 4px 0 var(--gold-l),inset -4px -4px 0 var(--gold-d)}
+.ipform .btn:hover{box-shadow:inset 4px 4px 0 var(--gold-l),inset -4px -4px 0 var(--gold-d);transform:translateY(-2px)}
+.form-err{font-family:var(--f-mono);font-size:20px;color:#8a1b12;margin:10px 0 0;min-height:0}
+.chips{display:grid;grid-template-columns:auto 1fr 1fr;gap:12px 12px;margin-top:22px;max-width:600px;align-items:center}
+.chips .lbl{grid-row:1/3}
+.chips .lbl{color:#24465f;margin-right:2px}
+.chip{display:flex;align-items:center;gap:8px;min-height:44px;min-width:0;white-space:nowrap;padding:0 14px;border:0;cursor:pointer;font-family:var(--f-mono);font-size:21px;color:var(--ink);background:#fff;
+  box-shadow:inset -3px -3px 0 #c7dbe8,0 0 0 3px var(--ink),0 4px 0 3px var(--ink);transition:transform .12s steps(2)}
+.chip:hover{transform:translateY(-3px);background:var(--gold-l)}
+.chip:active{transform:translateY(2px)}
+.chip i{width:12px;height:12px;background:linear-gradient(var(--grass) 0 40%,var(--dirt) 40%);box-shadow:0 0 0 2px var(--ink)}
+
+/* rack */
+.hero-rack{display:flex;flex-direction:column;align-items:center;gap:0}
+.rack-stage{display:flex;align-items:flex-end;justify-content:center;gap:28px;width:100%}
+.rack-wrap{position:relative;cursor:pointer;flex:none;-webkit-tap-highlight-color:transparent}
+.rack-wrap canvas{transition:filter .4s}
+.rack-labels{position:absolute;left:-52px;top:0;width:40px;height:100%;pointer-events:none}
+.rack-labels span{position:absolute;right:0;transform:translateY(-50%);font-family:var(--f-mono);font-size:19px;line-height:1;color:#355a75;transition:color .2s}
+.rack-labels span.on{color:var(--grass-xd)}
+.offsign{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) rotate(-3deg);transform-origin:50% -30px;background:var(--dirt);color:#ffd9d4;font-family:var(--f-ui);font-weight:700;font-size:20px;line-height:1.05;text-align:center;padding:10px 12px 8px;white-space:nowrap;
+  box-shadow:inset 3px 3px 0 var(--dirt-l),inset -3px -3px 0 var(--dirt-d),0 0 0 3px #000;animation:swing 2.4s ease-in-out infinite}
+.offsign b{display:block;color:var(--red);font-size:24px;text-shadow:2px 2px 0 #000}
+.offsign::before,.offsign::after{content:"";position:absolute;top:-26px;width:4px;height:26px;background:repeating-linear-gradient(#777 0 4px,#444 4px 8px)}
+.offsign::before{left:16px}.offsign::after{right:16px}
+@keyframes swing{0%,100%{transform:translate(-50%,-50%) rotate(-3deg)}50%{transform:translate(-50%,-50%) rotate(3deg)}}
+.meter-side{display:flex;flex-direction:column;gap:18px;min-width:0;flex:0 1 270px;width:270px;padding-bottom:56px}
+.paid{padding:16px 16px 14px}
+.paid .lbl{color:var(--muted)}
+.paid-date{font-family:var(--f-ui);font-weight:700;font-size:24px;line-height:1.05;color:var(--gold);margin-top:8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.paid-date.off{color:var(--red)}
+.paid-days{font-family:var(--f-mono);font-size:20px;color:#cfcbbf;margin-top:6px}
+.vol{padding:14px 16px 12px}
+.vol-v{font-family:var(--f-ui);font-weight:700;font-size:18px;color:#fff;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.vol-note{font-family:var(--f-mono);font-size:18px;line-height:1.15;color:var(--muted);margin-top:4px}
+.ex-tag{align-self:flex-start}
+
+/* range */
+input[type=range].prange{-webkit-appearance:none;appearance:none;width:100%;height:44px;background:transparent;cursor:pointer;margin:0;--p:50%}
+.prange::-webkit-slider-runnable-track{height:14px;background:linear-gradient(90deg,var(--grass) 0 var(--p),#33353b var(--p));box-shadow:inset 2px 2px 0 rgba(0,0,0,.45),0 0 0 3px #000}
+.prange::-moz-range-track{height:14px;background:linear-gradient(90deg,var(--grass) 0 var(--p),#33353b var(--p));box-shadow:0 0 0 3px #000}
+.prange::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;margin-top:-8px;border:0;background:linear-gradient(var(--grass) 0 38%,var(--dirt) 38%);box-shadow:inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.4),0 0 0 3px #000}
+.prange::-moz-range-thumb{width:30px;height:30px;border:0;border-radius:0;background:linear-gradient(var(--grass) 0 38%,var(--dirt) 38%);box-shadow:0 0 0 3px #000}
+.prange:focus{outline:none}.prange:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px #000,0 0 0 6px var(--gold)}
+
+/* result */
+.result-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:22px}
+.result-bar .note{font-family:var(--f-mono);font-size:20px;line-height:1.1;color:#173248}
+.result-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:32px;align-items:stretch}
+.srv{padding:22px;display:flex;flex-direction:column;gap:18px}
+.srv-head{display:flex;gap:18px;align-items:flex-start}
+.srv-icon{width:80px;height:80px;flex:none;background:#000;box-shadow:0 0 0 3px #000,inset 0 0 0 2px #333}
+.srv-main{min-width:0;flex:1}
+.srv-row1{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.srv-host{font-family:var(--f-ui);font-weight:700;font-size:20px;line-height:1.1;margin:0;color:#fff;overflow-wrap:anywhere}
+.motd{margin-top:10px;background:#000;padding:10px 12px;font-family:var(--f-mono);font-size:22px;line-height:1.12;color:#AAAAAA;min-height:68px;box-shadow:inset 3px 3px 0 #000,inset -2px -2px 0 #222}
+.motd-line{white-space:pre-wrap;overflow-wrap:anywhere;min-height:1.12em}
+.motd .obf{font-family:var(--f-mono)}
+.srv-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0}
+.srv-stats div{background:var(--panel-2);padding:12px 12px 10px;box-shadow:inset 2px 2px 0 rgba(255,255,255,.06),inset -2px -2px 0 #000}
+.srv-stats dt{font-family:var(--f-mono);font-size:18px;color:var(--muted);letter-spacing:.06em}
+.srv-stats dd{margin:6px 0 0;font-family:var(--f-ui);font-weight:700;font-size:16px;line-height:1.15;color:#fff;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.srv-stats dd.mono{font-family:var(--f-mono);font-weight:400;font-size:25px;line-height:1}
+.st-on{color:var(--led)!important}.st-off{color:var(--red)!important}
+.pbar{display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:3px;margin-top:8px}.pbar i{height:14px;background:#26282d;box-shadow:inset 2px 2px 0 #000}.pbar i.on{background:var(--led);box-shadow:inset -2px -2px 0 #2c9a3a}
+.srv-load .lbl{display:flex;justify-content:space-between;gap:8px}
+.bill{background:#000;padding:12px 14px 12px;box-shadow:inset 0 0 0 2px #2a2b30}.bill .lbl{display:flex;justify-content:space-between;gap:8px}.bill em{font-style:normal}
+.bill-days{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:2px;margin:10px 0 10px}.bill-days i{height:18px;background:#1b1c20;box-shadow:inset 0 -3px 0 #101114}.bill-days i:nth-child(7n){background:#232429}
+.bill-note{font-family:var(--f-mono);font-size:20px;line-height:1.2;color:#cfcbbf}.bill-note b{color:var(--gold);font-weight:400}.bill-note .r{color:var(--red)}
+.srv-coinline{background:#000;padding:12px 14px;font-family:var(--f-mono);font-size:20px;line-height:1.2;color:#cfcbbf;box-shadow:inset 0 0 0 2px #2a2b30}.srv-coinline b{color:var(--gold);font-weight:400}
+.srv-foot{font-family:var(--f-mono);font-size:18px;color:#8e8c85;margin-top:auto}
+.bars{display:inline-flex;align-items:flex-end;gap:3px;height:22px;flex:none}
+.bars i{width:5px;background:#3a3b40;box-shadow:0 0 0 1px #000}
+.bars i:nth-child(1){height:6px}.bars i:nth-child(2){height:10px}.bars i:nth-child(3){height:14px}.bars i:nth-child(4){height:18px}.bars i:nth-child(5){height:22px}
+.bars[data-s="scan"] i{animation:scan 1s steps(1) infinite}
+.bars[data-s="scan"] i:nth-child(2){animation-delay:.2s}.bars[data-s="scan"] i:nth-child(3){animation-delay:.4s}.bars[data-s="scan"] i:nth-child(4){animation-delay:.6s}.bars[data-s="scan"] i:nth-child(5){animation-delay:.8s}
+@keyframes scan{0%{background:var(--led)}20%{background:#3a3b40}}
+.bars[data-s="on"] i{background:var(--led);animation:bar-in .5s steps(1) backwards}
+.bars[data-s="on"] i:nth-child(2){animation-delay:.08s}.bars[data-s="on"] i:nth-child(3){animation-delay:.16s}.bars[data-s="on"] i:nth-child(4){animation-delay:.24s}.bars[data-s="on"] i:nth-child(5){animation-delay:.32s}
+@keyframes bar-in{0%{background:#3a3b40}}
+.bars[data-s="off"] i{background:#4a1612}
+.bars[data-s="off"] i:nth-child(5){background:var(--red)}
+
+.coin{padding:22px;display:flex;flex-direction:column;gap:16px}
+.coin-id{display:flex;gap:16px;align-items:center}
+.coin-face{width:72px;height:72px;flex:none;border-radius:50%;padding:7px;background:var(--gold);box-shadow:inset 4px 4px 0 var(--gold-l),inset -4px -4px 0 var(--gold-d),0 0 0 3px #000}
+.coin-face img{width:58px;height:58px;border-radius:50%;background:#000}
+.coin-name{font-family:var(--f-ui);font-weight:700;font-size:26px;line-height:1;color:#fff;overflow-wrap:anywhere}
+.coin-ticker{font-family:var(--f-mono);font-size:24px;color:var(--gold);margin-top:4px}
+.vault{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vault div{background:var(--panel-2);padding:12px;box-shadow:inset 2px 2px 0 rgba(255,255,255,.06),inset -2px -2px 0 #000}
+.vault b{display:block;font-family:var(--f-ui);font-weight:700;font-size:18px;margin-top:6px;color:#fff;line-height:1.1}
+.vault b.dim{font-family:var(--f-mono);font-weight:400;font-size:21px;color:#cfcbbf}
+.claim{background:#000;padding:12px 12px 10px;box-shadow:inset 0 0 0 2px #2a2b30}
+.code-row{display:flex;gap:10px;align-items:center;margin-top:8px}
+.code-row code{flex:1;min-width:0;font-family:var(--f-mono);font-size:30px;line-height:1;color:var(--gold);letter-spacing:.03em;padding:8px 10px;background:#141414;box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 #2b2b2b}
+.hint{margin:8px 0 0;font-size:14.5px;color:#cfcbbf}
+.verify-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.verify-out{font-family:var(--f-mono);font-size:20px;line-height:1.15;color:#cfcbbf;flex:1;min-width:160px}
+.verify-out b{font-family:var(--f-ui);font-weight:700;font-size:16px}
+.verify-out .ok{color:var(--led)}.verify-out .no{color:var(--red)}
+.loading-card{padding:26px;display:flex;gap:18px;align-items:center;font-family:var(--f-mono);font-size:24px}
+
+/* ground */
+.ground{position:relative;z-index:1;height:120px;margin-top:48px}
+.ground canvas{width:100%;height:120px}
+
+/* ---------- strata sections ---------- */
+.stratum{position:relative;padding:92px 0 96px;background-color:var(--dirt);background-size:288px 288px;image-rendering:pixelated}
+.stratum::before{content:"";position:absolute;left:0;right:0;top:0;height:24px;background-image:var(--edge);background-size:96px 24px;background-repeat:repeat-x;image-rendering:pixelated}
+.s-dirt{background-color:var(--dirt)}
+.s-dirt2{background-color:#6f4622}
+.s-stone{background-color:#7D8084}
+.s-stone2{background-color:#55585D}
+.s-deep{background-color:#2B2D33}
+.s-bed{background-color:#151517}
+.depth{display:inline-flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:21px;letter-spacing:.08em;color:var(--gold);background:var(--ink);padding:6px 12px 4px;box-shadow:0 0 0 3px #000}
+.depth i{width:10px;height:10px;background:var(--gold)}
+.h2{font-family:var(--f-pixel);font-weight:700;font-size:clamp(34px,4vw,54px);line-height:1.05;margin:18px 0 14px;color:#fff;text-shadow:4px 4px 0 #000;text-wrap:balance}
+.lead{font-size:18.5px;line-height:1.55;max-width:640px;margin:0;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.45)}
+.sec-head{margin-bottom:44px}
+.sec-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px 48px;align-items:end}.sec-split .h2{margin-bottom:0}.sec-split .lead{justify-self:end;max-width:460px}
+@media (max-width:820px){.sec-split{grid-template-columns:1fr}.sec-split .lead{justify-self:start}}
+
+/* hotbar */
+.hotbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:8px;background:#0d0d0d;box-shadow:0 0 0 4px #000,inset 4px 4px 0 rgba(255,255,255,.08),8px 8px 0 4px rgba(0,0,0,.28)}
+.slot{position:relative;aspect-ratio:auto;height:150px;border:0;cursor:pointer;background:#3b3c41;display:grid;place-items:center;margin:4px;
+  box-shadow:inset 5px 5px 0 #1f2023,inset -5px -5px 0 #5c5e64;transition:background .15s}
+.slot svg{width:84px;height:84px;transition:transform .15s steps(2)}
+.slot .n{position:absolute;right:12px;bottom:8px;font-family:var(--f-ui);font-weight:700;font-size:20px;color:#fff;text-shadow:3px 3px 0 #3f3f3f}
+.slot .k{display:none}
+.slot.sel{background:#4b4d53;box-shadow:inset 5px 5px 0 #1f2023,inset -5px -5px 0 #6e7077,0 0 0 4px #fff,0 0 0 8px #000}
+.slot.sel svg{transform:translateY(-6px) scale(1.06)}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;margin-top:28px}
+.step{padding:20px 20px 22px;transition:transform .15s steps(2)}
+.step h3{font-family:var(--f-pixel);font-weight:700;font-size:23px;line-height:1.1;margin:8px 0 8px}
+.step p{margin:0;font-size:15.5px;line-height:1.5;color:#d9d6cc}
+.step.sel{box-shadow:inset 4px 4px 0 rgba(255,255,255,.12),inset -4px -4px 0 rgba(0,0,0,.55),0 0 0 4px var(--gold),8px 8px 0 4px rgba(0,0,0,.28);transform:translateY(-4px)}
+.step .lbl{color:var(--gold)}
+
+/* claim */
+.claim-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:48px;align-items:start}
+.slist{padding:14px;background:#0b0b0b}
+.slist-title{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-mono);font-size:19px;color:var(--muted);padding:2px 4px 12px}
+.srow{display:flex;gap:14px;align-items:flex-start;padding:10px;background:#000;box-shadow:inset 0 0 0 2px #3b3b3b}
+.srow.faded{opacity:.5;margin-top:8px;box-shadow:none}
+.srow-icon{width:64px;height:64px;flex:none}
+.srow-main{flex:1;min-width:0}
+.srow-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.srow-name{font-family:var(--f-mono);font-size:24px;color:#fff;line-height:1}
+.srow-pl{display:flex;gap:10px;align-items:center;font-family:var(--f-mono);font-size:20px;color:#AAAAAA}
+.srow .motd{background:transparent;box-shadow:none;padding:4px 0 0;min-height:0;font-size:21px}
+.mark-code{color:var(--gold);outline:3px solid var(--gold);outline-offset:2px;padding:0 3px;background:rgba(255,210,74,.14);animation:mark 1.6s steps(2) infinite}
+@keyframes mark{50%{outline-color:transparent}}
+.callout{display:flex;align-items:center;gap:10px;margin:14px 0 2px 92px;font-family:var(--f-mono);font-size:20px;color:var(--gold)}
+.callout svg{width:22px;height:22px;flex:none}
+.claim-steps{display:flex;flex-direction:column;gap:16px}
+.cstep{display:flex;gap:16px;padding:16px 18px;align-items:flex-start}
+.cstep .num{flex:none;width:44px;height:44px;display:grid;place-items:center;font-family:var(--f-ui);font-weight:700;font-size:22px;color:var(--ink);background:var(--gold);box-shadow:inset 3px 3px 0 var(--gold-l),inset -3px -3px 0 var(--gold-d),0 0 0 3px #000}
+.cstep h3{margin:0 0 4px;font-family:var(--f-pixel);font-weight:700;font-size:20px}
+.cstep p{margin:0;font-size:15.5px;color:#d9d6cc}
+.cstep code{font-family:var(--f-mono);font-size:19px;color:var(--gold);background:#000;padding:1px 6px}
+.props{margin-top:16px;padding:14px 16px;font-family:var(--f-mono);font-size:21px;line-height:1.25;color:#cfcbbf;background:#0b0b0b;white-space:pre-wrap;overflow-wrap:anywhere}
+.props .c{color:#6f6d66}.props .k{color:var(--grass-l)}.props .g{color:var(--gold)}
+.public{margin-top:28px;padding:18px 20px;display:flex;gap:16px;align-items:flex-start}
+.public svg{width:40px;height:40px;flex:none}
+.public p{margin:0;font-size:16px;color:#e6e3d9}
+.public b{color:#fff}
+
+/* meter section */
+.meter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start}
+.meter-ctl{padding:24px}
+.meter-ctl .vol-v{font-size:28px;margin:8px 0 6px}
+.presets{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+.presets .btn{min-height:44px;min-width:56px;font-size:16px;padding:0 14px}
+.rates{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.rates div{background:var(--panel-2);padding:12px;box-shadow:inset 2px 2px 0 rgba(255,255,255,.06),inset -2px -2px 0 #000}
+.rates b{display:block;font-family:var(--f-ui);font-weight:700;font-size:17px;margin-top:6px}
+.rates small{display:block;font-family:var(--f-mono);font-size:17px;color:var(--muted);margin-top:2px}
+.meter-out{padding:24px}
+.math{display:flex;flex-direction:column;gap:0;margin:0}
+.math div{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:12px 0;border-bottom:3px dashed #2a2b30}
+.math dt{font-family:var(--f-mono);font-size:20px;color:var(--muted);letter-spacing:.04em}
+.math dd{margin:0;font-family:var(--f-ui);font-weight:700;font-size:18px;color:#fff;text-align:right;font-variant-numeric:tabular-nums}
+.math .big dd{font-size:24px;color:var(--gold)}
+.math .big dd.off{color:var(--red)}
+.months{margin-top:22px}
+.months-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;margin-top:10px}
+.months-grid i{aspect-ratio:1;background:#1d1e22;box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 #2c2e33;transition:background .2s steps(2)}
+.months-grid i.on{background:linear-gradient(var(--grass) 0 35%,var(--dirt) 35%);box-shadow:inset 2px 2px 0 rgba(255,255,255,.3),inset -2px -2px 0 rgba(0,0,0,.4)}
+.months-cap{font-family:var(--f-mono);font-size:19px;color:var(--muted);margin-top:10px;display:flex;justify-content:space-between;gap:10px}
+.months-cap b{color:var(--gold);font-weight:400}
+.oneline{margin-top:18px;font-size:15px;color:#cfcbbf}
+
+/* rules */
+.rules{width:100%;border-collapse:separate;border-spacing:0 10px}
+.rules td{background:var(--panel);padding:18px 20px;vertical-align:middle;box-shadow:inset 0 4px 0 rgba(255,255,255,.07),inset 0 -4px 0 rgba(0,0,0,.5)}
+.rules td:first-child{width:64px;padding-right:0;box-shadow:inset 4px 4px 0 rgba(255,255,255,.07),inset 0 -4px 0 rgba(0,0,0,.5)}
+.rules td:last-child{box-shadow:inset -4px 4px 0 rgba(0,0,0,.0),inset 0 4px 0 rgba(255,255,255,.07),inset -4px -4px 0 rgba(0,0,0,.5)}
+.rules .ic{display:block;width:40px;height:40px}
+.logo-slot{display:block}.logo-slot svg{width:100%;height:100%}
+.slot .ico{display:block}
+.rules th{font-family:var(--f-pixel);font-weight:700;font-size:22px;line-height:1.15;text-align:left;width:40%;padding:18px 20px;background:var(--panel);color:#fff;box-shadow:inset 0 4px 0 rgba(255,255,255,.07),inset 0 -4px 0 rgba(0,0,0,.5)}
+.rules td.d{color:#d9d6cc;font-size:15.5px}
+.rules-wrap{outline:4px solid #000;outline-offset:-0px}
+
+/* token */
+.token{display:grid;grid-template-columns:auto minmax(0,1fr);gap:40px;padding:34px;align-items:center}
+.token-mark{width:180px;height:200px;filter:drop-shadow(0 0 28px rgba(255,210,74,.35)) drop-shadow(8px 10px 0 rgba(0,0,0,.45));animation:bob 3.2s steps(8) infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.token h2{margin:0 0 6px;font-family:var(--f-ui);font-size:clamp(36px,4vw,52px)}
+.ca{display:flex;gap:10px;align-items:center;margin:18px 0 18px;max-width:640px}
+.ca code{flex:1;min-width:0;font-family:var(--f-mono);font-size:22px;color:#fff;background:#000;padding:11px 14px 9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 #2b2b2b}
+.ca code.empty{color:var(--gold)}
+.token-btns{display:flex;flex-wrap:wrap;gap:16px}
+.split{margin-top:30px}
+.split-bar{display:grid;grid-template-columns:1fr 1fr;height:56px;margin-top:10px;box-shadow:0 0 0 3px #000}
+.split-bar div{display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f-ui);font-weight:700;font-size:15px;text-align:center;padding:0 8px;line-height:1.15}
+.split-bar .burn{background:#d8452f;color:#fff;box-shadow:inset 4px 4px 0 #ff7a5c,inset -4px -4px 0 #8f2416}
+.split-bar .comm{background:var(--grass);color:#0d1a08;box-shadow:inset 4px 4px 0 var(--grass-l),inset -4px -4px 0 var(--grass-d)}
+.split-note{font-size:15.5px;color:#d9d6cc;margin:14px 0 0}
+.split-note b{color:#fff}
+
+/* footer */
+.foot{padding:40px 0 48px}
+.foot .wrap{display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.foot p{margin:0;font-size:14px;color:#a3a199;max-width:640px}
+.foot .brand-word{font-size:20px}
+
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:80;display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.sheet-bg{position:absolute;inset:0;background:rgba(5,10,16,.7)}
+.sheet-card{position:relative;width:100%;max-width:520px;padding:26px;margin-bottom:12px;animation:sheet-in .22s steps(4)}
+@keyframes sheet-in{from{transform:translateY(40px);opacity:0}}
+.sheet-card h3{font-family:var(--f-pixel);font-weight:700;font-size:28px;margin:14px 0 10px;line-height:1.1}
+.sheet-card p{margin:0 0 14px;color:#d9d6cc;font-size:16px}
+.sheet-card p b{color:#fff}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:70}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:90;font-family:var(--f-mono);font-size:22px;background:var(--gold);color:var(--ink);padding:10px 16px 8px;box-shadow:0 0 0 3px #000,4px 4px 0 3px #000}
+
+/* ---------- responsive ---------- */
+@media (max-width:1080px){
+  .hero-grid{grid-template-columns:1fr;grid-template-areas:"copy" "result" "rack";row-gap:48px}
+  .rack-stage{justify-content:center}
+  .result-grid{grid-template-columns:1fr}
+  .claim-grid,.meter{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .hero{padding-top:36px}
+  .wordmark{font-size:46px;margin-bottom:22px}
+  .wordmark .ticker{display:none}
+  .h1{font-size:33px}
+  .sub{font-size:17px;margin-bottom:22px}
+  .ipform{padding:6px;flex-wrap:wrap}
+  .ipform label{font-size:21px;padding:0 6px}
+  .ipform input{font-size:23px;height:54px;padding:0 10px}
+  .ipform .btn{min-height:54px;margin-left:6px;padding:0 14px;font-size:16px}
+  .chips{gap:10px;grid-template-columns:1fr 1fr}
+  .chips .lbl{grid-row:auto;grid-column:1/-1}
+  .chip{font-size:19px;padding:0 11px}
+  .rack-stage{flex-direction:column;align-items:center;gap:20px}
+  .meter-side{max-width:none;width:100%;padding-bottom:0}
+  .srv,.coin{padding:16px}
+  .srv-icon{width:64px;height:64px}
+  .srv-host{font-family:var(--f-mono);font-weight:400;font-size:28px;letter-spacing:.02em}
+  .motd{font-size:19px}
+  .srv-stats{grid-template-columns:1fr 1fr}
+  .srv-stats div:last-child{grid-column:1/-1}
+  .coin-name{font-size:22px}
+  .code-row code{font-size:25px}
+  .ground{margin-top:40px;height:96px}.ground canvas{height:96px}
+  .stratum{padding:72px 0 76px}
+  .lead{font-size:17px}
+  .slot{height:92px;margin:3px}
+  .slot svg{width:52px;height:52px}
+  .slot .n{font-size:18px;right:7px;bottom:4px}
+  .slot .k{display:none}
+  .hotbar{padding:5px}
+  .steps{gap:16px}
+  .step{padding:14px 14px 16px}
+  .step h3{font-size:19px}
+  .step p{font-size:14.5px}
+  .callout{margin-left:0}
+  .srow-icon{width:48px;height:48px}
+  .srow-name{font-size:21px}
+  .srow .motd{font-size:18px}
+  .rules,.rules tbody,.rules tr,.rules th,.rules td{display:block;width:auto}
+  .rules{border-spacing:0}
+  .rules tr{position:relative;margin-bottom:14px;background:var(--panel);box-shadow:0 0 0 4px #000}
+  .rules td:first-child{position:absolute;left:14px;top:16px;padding:0;background:none;box-shadow:none}
+  .rules th{padding:16px 16px 4px 68px;font-size:20px;box-shadow:none;width:auto}
+  .rules td.d{padding:4px 16px 16px 68px;box-shadow:none}
+  .token{grid-template-columns:1fr;padding:22px;gap:18px;justify-items:start}
+  .token-mark{width:110px;height:122px}
+  .token-btns .btn{flex:1 1 40%}
+  .split-bar{height:auto;grid-template-columns:1fr}
+  .split-bar div{padding:12px 8px}
+  .months-grid{gap:4px}
+  .presets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.presets .btn{padding:0 4px;font-size:12px;min-width:0}
+  .rates{grid-template-columns:1fr 1fr}
+  .meter-ctl,.meter-out{padding:18px}
+  .math dd{font-size:16px}.math .big dd{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="CraftPad home"><span class="mark logo-slot" data-size="nav"></span><span class="brand-word">CRAFT<span>PAD</span></span></a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#how">HOW</a><a href="#claim">CLAIM</a><a href="#meter">METER</a><a href="#rules">RULES</a><a href="#token">$CRAFT</a>
+    </nav>
+    <div class="nav-right">
+      <button class="snd" id="sndBtn" type="button" aria-pressed="false" aria-label="Sound off. Turn sound on" title="Sound"></button>
+      <a class="btn btn-sm" id="navBuy" href="#token">BUY $CRAFT</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero" aria-labelledby="heroTitle">
+  <canvas id="sky" class="pix" aria-hidden="true"></canvas>
+  <div class="wrap hero-in">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="tag">$CRAFT</span><span class="tag tag-green">SERVER COIN PAD ON PUMP.FUN</span></p>
+        <p class="wordmark" aria-label="CraftPad">CRAFT<span>PAD</span></p>
+        <h1 class="h1" id="heroTitle"><span>Every server gets a coin.</span><span class="l2">The fees pay the hosting.</span></h1>
+        <p class="sub">Paste any Minecraft server IP. Its coin's creator fees fill a vault that keeps the server online. <b>The launcher can't touch them.</b></p>
+        <form class="ipform" id="ipForm" autocomplete="off" novalidate>
+          <label for="ipInput">IP&gt;</label>
+          <input id="ipInput" name="ip" type="text" inputmode="url" spellcheck="false" autocapitalize="off" placeholder="PASTE A SERVER IP" aria-describedby="ipErr" maxlength="80">
+          <button class="btn" type="submit" id="pingBtn">PING</button>
+        </form>
+        <p class="form-err" id="ipErr" role="alert" hidden></p>
+        <div class="chips" id="chips">
+          <span class="lbl">TRY</span>
+          <button type="button" class="chip" data-ip="mc.hypixel.net"><i></i>mc.hypixel.net</button>
+          <button type="button" class="chip" data-ip="play.cubecraft.net"><i></i>play.cubecraft.net</button>
+          <button type="button" class="chip" data-ip="2b2t.org"><i></i>2b2t.org</button>
+          <button type="button" class="chip" data-ip="mineplex.com"><i></i>mineplex.com</button>
+        </div>
+      </div>
+
+      <div class="hero-rack" aria-label="Hosting meter, example calculator">
+        <div class="rack-stage">
+          <div class="rack-wrap" id="rackWrap" role="img" aria-label="Pixel server rack. Lit units show hosting days paid.">
+            <canvas id="rack" class="pix" width="76" height="160"></canvas>
+            <div class="rack-labels" id="rackLabels" aria-hidden="true"></div>
+            <div class="offsign" id="offSign" hidden><b>SERVER</b>OFFLINE</div>
+          </div>
+          <div class="meter-side">
+            <span class="tag ex-tag">EXAMPLE CALCULATOR</span>
+            <div class="px paid">
+              <div class="lbl">PAID UNTIL</div>
+              <div class="paid-date" id="heroPaid">--</div>
+              <div class="paid-days" id="heroDays">--</div>
+            </div>
+            <div class="px vol">
+              <label class="lbl" for="heroVol">IF THIS COIN DID</label>
+              <div class="vol-v" id="heroVolV">1,000 SOL volume</div>
+              <input class="prange" id="heroVol" type="range" min="0" max="1000" step="1" value="600" aria-describedby="heroVolNote">
+              <div class="vol-note" id="heroVolNote">drag to 0 to watch it go dark</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result" id="result" aria-live="polite">
+        <div class="result-bar"><span class="tag tag-green" id="resTag"><span class="dot blink"></span>LIVE PING</span><span class="note" id="resNote"></span></div>
+        <div class="px loading-card" id="resLoading"><span class="bars" data-s="scan"><i></i><i></i><i></i><i></i><i></i></span><span id="loadingTxt">PINGING...</span></div>
+        <div class="result-grid" id="resGrid" hidden>
+          <article class="px srv" aria-label="Server card">
+            <div class="srv-head">
+              <img id="srvIcon" class="srv-icon pix" width="64" height="64" alt="Server icon">
+              <div class="srv-main">
+                <div class="srv-row1"><h3 class="srv-host" id="srvHost">--</h3><span class="bars" id="srvBars" data-s="scan"><i></i><i></i><i></i><i></i><i></i></span></div>
+                <div class="motd" id="srvMotd"></div>
+              </div>
+            </div>
+            <dl class="srv-stats">
+              <div><dt>STATUS</dt><dd id="srvStatus">--</dd></div>
+              <div><dt>PLAYERS</dt><dd id="srvPlayers" class="mono">--</dd></div>
+              <div><dt>VERSION</dt><dd id="srvVersion" class="mono">--</dd></div>
+            </dl>
+            <div class="srv-load"><div class="lbl"><span>SERVER LOAD</span><span id="srvLoadPct">--</span></div><div class="pbar" id="srvPbar"></div></div>
+            <div class="bill">
+              <div class="lbl"><span>HOSTING BILL</span><span>EXAMPLE $<em id="billRate">1.50</em>/DAY</span></div>
+              <div class="bill-days" id="billDays"></div>
+              <div class="bill-note" id="srvCoinline"></div>
+            </div>
+            <div class="srv-foot" id="srvFoot"></div>
+          </article>
+          <article class="px coin" aria-label="Coin card">
+            <div><span class="tag tag-gold">THIS SERVER'S COIN</span></div>
+            <div class="coin-id">
+              <div class="coin-face"><img id="coinFace" class="pix" width="58" height="58" alt=""></div>
+              <div style="min-width:0"><div class="coin-name" id="coinName">--</div><div class="coin-ticker" id="coinTicker">$--</div></div>
+            </div>
+            <div class="vault">
+              <div><span class="lbl">VAULT</span><b>0.00 SOL</b></div>
+              <div><span class="lbl">PAID UNTIL</span><b class="dim">not funded yet</b></div>
+            </div>
+            <div class="claim">
+              <span class="lbl">CLAIM CODE</span>
+              <div class="code-row"><code id="claimCode">craftpad-....</code><button class="btn btn-sm btn-dark" type="button" id="copyCode">COPY</button></div>
+              <p class="hint">Server owner: put this anywhere in your MOTD, then hit verify.</p>
+            </div>
+            <div class="verify-row">
+              <button class="btn btn-green" type="button" id="verifyBtn">VERIFY</button>
+              <span class="verify-out" id="verifyOut">Checks the live MOTD for the code.</span>
+            </div>
+            <button class="btn btn-block" type="button" id="launchBtn">LAUNCH THIS COIN</button>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ground" aria-hidden="true"><canvas id="groundCv" class="pix"></canvas></div>
+</section>
+
+<section class="stratum s-dirt" id="how" data-tex="dirt" aria-labelledby="howTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="depth"><i></i>Y 58 &middot; DIRT</span>
+      <h2 class="h2" id="howTitle">Four slots. That's the pad.</h2>
+      <p class="lead">No forms, no presale, no dev wallet. One server, one coin, one vault.</p>
+    </div>
+    <div class="hotbar" id="hotbar" role="tablist" aria-label="How it works">
+      <button class="slot sel" type="button" role="tab" aria-selected="true" data-i="0"><span class="k">1</span><span class="ico" data-icon="screen"></span><span class="n">1</span></button>
+      <button class="slot" type="button" role="tab" aria-selected="false" data-i="1"><span class="k">2</span><span class="ico" data-icon="coin"></span><span class="n">2</span></button>
+      <button class="slot" type="button" role="tab" aria-selected="false" data-i="2"><span class="k">3</span><span class="ico" data-icon="vault"></span><span class="n">3</span></button>
+      <button class="slot" type="button" role="tab" aria-selected="false" data-i="3"><span class="k">4</span><span class="ico" data-icon="key"></span><span class="n">4</span></button>
+    </div>
+    <div class="steps" id="steps">
+      <div class="px step sel" data-i="0"><span class="lbl">SLOT 1</span><h3>Paste IP</h3><p>Any Java server IP. We ping it and pull its real icon, MOTD and player count.</p></div>
+      <div class="px step" data-i="1"><span class="lbl">SLOT 2</span><h3>Launch coin</h3><p>Its coin goes live on pump.fun. 100% of the creator fee is split to the server's vault, locked at launch.</p></div>
+      <div class="px step" data-i="2"><span class="lbl">SLOT 3</span><h3>Fees fill the vault</h3><p>Every trade drips creator fees in. The vault pays the hosting bill, so SOL turns into days online.</p></div>
+      <div class="px step" data-i="3"><span class="lbl">SLOT 4</span><h3>Owner claims</h3><p>The owner drops a claim code in the MOTD. A public ping sees it and the vault pays out to them.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="stratum s-dirt2" id="claim" data-tex="dirt2" data-edge="dirt" aria-labelledby="claimTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="depth"><i></i>Y 41 &middot; DEEP DIRT</span>
+      <h2 class="h2" id="claimTitle">The claim is one line of MOTD.</h2>
+      <p class="lead">Every server answers a ping with its MOTD. Only the owner can change it. So that's the proof, and anyone can check it.</p>
+    </div>
+    <div class="claim-grid">
+      <div>
+        <div class="px slist">
+          <div class="slist-title"><span>SERVER LIST</span><span>MOCK</span></div>
+          <div class="srow">
+            <span class="srow-icon logo-slot" data-size="row"></span>
+            <div class="srow-main">
+              <div class="srow-top"><span class="srow-name">Your Server</span><span class="srow-pl">42/100 <span class="bars" data-s="on"><i></i><i></i><i></i><i></i><i></i></span></span></div>
+              <div class="motd"><div class="motd-line" id="mockL1"></div><div class="motd-line" id="mockL2"></div></div>
+            </div>
+          </div>
+          <div class="callout"><svg viewBox="0 0 11 11" class="pix" aria-hidden="true" shape-rendering="crispEdges"><path fill="#FFD24A" d="M5 0h1v1h1v1h1v1h1v1h-3v7h-1v-7h-3v-1h1v-1h1v-1h1z"/></svg>CRAFTPAD PINGS THE IP AND LOOKS FOR THIS</div>
+          <div class="srow faded">
+            <span class="srow-icon" style="background:#2a2b30"></span>
+            <div class="srow-main">
+              <div class="srow-top"><span class="srow-name">Some Other Server</span><span class="srow-pl">8/50</span></div>
+              <div class="motd"><div class="motd-line" id="mockL3"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="px public">
+          <svg viewBox="0 0 10 10" class="pix" shape-rendering="crispEdges" aria-hidden="true"><path fill="#5DBB3F" d="M1 0h8v1h1v8h-1v1h-8v-1h-1v-8h1z"/><path fill="#0d1a08" d="M7 3h1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h1v1h1v-1h1v-1h1z"/></svg>
+          <p><b>The check is public.</b> VERIFY pings the server through a public status API, the same way a server list does. Code found: the vault pays the owner's wallet, or the host directly. Not found: the vault keeps stacking.</p>
+        </div>
+      </div>
+      <div class="claim-steps">
+        <div class="px cstep"><span class="num">1</span><div><h3>Grab your code</h3><p>Paste your IP up top. Your code is fixed, made from your hostname, like <code>craftpad-7f3a</code>.</p></div></div>
+        <div class="px cstep"><span class="num">2</span><div><h3>Put it in your MOTD</h3><p>Either line, any color, next to anything. MOTD plugins work too.</p>
+          <div class="props"><span class="c"># server.properties</span>
+<span class="k">motd</span>=My Server | <span class="g">craftpad-7f3a</span></div></div></div>
+        <div class="px cstep"><span class="num">3</span><div><h3>Hit verify</h3><p>We ping, see the code, and switch the payout to you. Remove it after if you like. The claim sticks.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stratum s-stone" id="meter" data-tex="stone" data-edge="dirt2" aria-labelledby="meterTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="depth"><i></i>Y 12 &middot; STONE</span>
+      <h2 class="h2" id="meterTitle">Fees buy days online.</h2>
+      <p class="lead">Example calculator. Drag the volume and watch the rack up top fill. These are example rates, not live vault data.</p>
+    </div>
+    <div class="meter">
+      <div class="px meter-ctl">
+        <span class="tag">EXAMPLE CALCULATOR</span>
+        <div style="margin-top:18px"><label class="lbl" for="meterVol">COIN TRADING VOLUME</label></div>
+        <div class="vol-v" id="meterVolV">1,000 SOL</div>
+        <input class="prange" id="meterVol" type="range" min="0" max="1000" step="1" value="600">
+        <div class="presets" id="presets">
+          <button class="btn btn-dark" type="button" data-v="0">0</button>
+          <button class="btn btn-dark" type="button" data-v="100">100 SOL</button>
+          <button class="btn btn-dark" type="button" data-v="1000">1K SOL</button>
+          <button class="btn btn-dark" type="button" data-v="10000">10K SOL</button>
+        </div>
+        <div class="rates">
+          <div><span class="lbl">CREATOR FEE</span><b id="rateFee">0.3%</b><small>example rate</small></div>
+          <div><span class="lbl">HOSTING</span><b id="rateHost">$1.50/day</b><small>example rate</small></div>
+          <div style="grid-column:1/-1"><span class="lbl">SOL PRICE</span><b id="rateSol">$150</b><small id="rateSolSrc">fallback price</small></div>
+        </div>
+      </div>
+      <div class="px meter-out">
+        <dl class="math">
+          <div><dt>CREATOR FEES</dt><dd id="mFee">--</dd></div>
+          <div><dt>IN USD</dt><dd id="mUsd">--</dd></div>
+          <div><dt>HOSTING DAYS</dt><dd id="mDays">--</dd></div>
+          <div class="big"><dt>PAID UNTIL</dt><dd id="mPaid">--</dd></div>
+        </dl>
+        <div class="months">
+          <span class="lbl">NEXT 24 MONTHS</span>
+          <div class="months-grid" id="months"></div>
+          <div class="months-cap"><span id="monthsA">0 of 24 months</span><b id="monthsB"></b></div>
+        </div>
+        <p class="oneline" id="oneSol">Example rate: 1 SOL buys about 100 days of a mid-size server.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stratum s-stone2" id="rules" data-tex="stone2" data-edge="stone" aria-labelledby="rulesTitle">
+  <div class="wrap">
+    <div class="sec-head sec-split">
+      <div><span class="depth"><i></i>Y -8 &middot; DEEPSLATE</span>
+      <h2 class="h2" id="rulesTitle">What's true.</h2></div>
+      <p class="lead">Six rules. Same for every coin on the pad, and none of them can be switched off after launch.</p>
+    </div>
+    <table class="rules">
+      <tbody>
+        <tr><td><span class="ic" data-icon="check"></span></td><th scope="row">The launcher gets 0 fees</th><td class="d">100% of the coin's creator fee goes to the server's vault. Not the launcher, not CraftPad.</td></tr>
+        <tr><td><span class="ic" data-icon="lock"></span></td><th scope="row">Fee split locked at launch</th><td class="d">Set with pump.fun creator-fee sharing when the coin is created. Nobody can edit it after.</td></tr>
+        <tr><td><span class="ic" data-icon="check"></span></td><th scope="row">Vault pays hosting, or the owner after MOTD proof</th><td class="d">Once the claim code shows up in a public ping, payouts go to the owner's wallet or straight to the host.</td></tr>
+        <tr><td><span class="ic" data-icon="stack"></span></td><th scope="row">Unclaimed vaults keep stacking</th><td class="d">No expiry. The fees wait until the owner shows up.</td></tr>
+        <tr><td><span class="ic" data-icon="check"></span></td><th scope="row">Anyone can launch for any server</th><td class="d">The owner still gets the money. Launching a server's coin earns the launcher nothing but the bag they buy.</td></tr>
+        <tr><td><span class="ic" data-icon="info"></span></td><th scope="row">Not affiliated with Mojang or Microsoft</th><td class="d">CraftPad is independent. A server is just an IP we can ping.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="stratum s-deep" id="token" data-tex="deep" data-edge="stone2" aria-labelledby="tokenTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="depth"><i></i>Y -54 &middot; GOLD LAYER</span>
+    </div>
+    <div class="px token">
+      <span class="token-mark logo-slot" data-size="big"></span>
+      <div style="min-width:0">
+        <h2 class="h2" id="tokenTitle">$CRAFT</h2>
+        <p class="lead" style="text-shadow:none;color:#d9d6cc">The pad's own coin, on pump.fun.</p>
+        <div class="ca"><code id="caText" class="empty">CA posts at launch</code><button class="btn btn-sm btn-dark" type="button" id="caCopy" hidden>COPY</button></div>
+        <div class="token-btns">
+          <a class="btn" id="buyBtn" href="#token">BUY</a>
+          <a class="btn btn-stone" id="chartBtn" href="#token">CHART</a>
+          <a class="btn btn-dark" id="xBtn" href="#token"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.2 2.3h3.4l-7.4 8.4 8.7 11.5h-6.8l-5.3-7-6.1 7H1.3l7.9-9L.9 2.3h7l4.8 6.4 5.5-6.4Zm-1.2 17.9h1.9L7.1 4.2H5.1l11.9 16Z"/></svg><span id="xLbl">X</span></a>
+        </div>
+        <div class="split">
+          <span class="lbl">$CRAFT CREATOR FEE</span>
+          <div class="split-bar"><div class="burn">50% BUYBACK + BURN $CRAFT</div><div class="comm">50% COMMUNITY SERVER VAULT</div></div>
+          <p class="split-note"><b>Child coins:</b> 100% creator fee to the server vault. CraftPad charges nothing extra on launch.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="stratum s-bed foot" data-tex="bed" data-edge="deep">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="mark logo-slot" data-size="nav"></span><span class="brand-word">CRAFT<span>PAD</span></span></a>
+    <p>CraftPad is an independent project. Not affiliated with Mojang Studios or Microsoft. Minecraft is a trademark of Mojang Synergies AB.</p>
+  </div>
+</footer>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-bg" data-close></div>
+  <div class="px sheet-card">
+    <span class="tag tag-gold">NOT LIVE YET</span>
+    <h3 id="sheetTitle">Launches open at launch.</h3>
+    <p id="sheetBody">The CraftPad launcher isn't live yet.</p>
+    <p>The claim code stays the same. It comes from the hostname, so owners can add it to their MOTD today.</p>
+    <button class="btn btn-block" type="button" data-close id="sheetClose">GOT IT</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+(function(){
+'use strict';
+var C = Object.assign({NAME:'CraftPad',TICKER:'CRAFT',CA:'',CHAIN:'solana',PAD:'pumpfun',X:'',BUY:'',CHART:'',LOGO:'',HOST_USD_PER_DAY:1.5,CREATOR_FEE_PCT:0.3}, window.CRAFT_CFG || {});
+C.CA = String(C.CA || '').trim();
+if (!C.BUY && C.CA) C.BUY = 'https://pump.fun/coin/' + C.CA;
+if (!C.CHART && C.CA) C.CHART = 'https://gmgn.ai/sol/token/' + C.CA;
+var HOST = Number(C.HOST_USD_PER_DAY) > 0 ? Number(C.HOST_USD_PER_DAY) : 1.5;
+var FEE = Number(C.CREATOR_FEE_PCT) >= 0 ? Number(C.CREATOR_FEE_PCT) : 0.3;
+var SECT = '\u00a7';
+var REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, txt){ var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+function store(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+function rng(seed){ var s = seed >>> 0 || 1; return function(){ s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return (s % 100000) / 100000; }; }
+function fmt(n, d){ return Number(n).toLocaleString('en-US', {minimumFractionDigits: d || 0, maximumFractionDigits: d || 0}); }
+var MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function dateIn(days){ var d = new Date(Date.now() + Math.min(days, 3e6) * 864e5); return MON[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); }
+
+/* ---------- pixel art ---------- */
+var PAL = {k:'#121212',K:'#000000',g:'#FFD24A',h:'#FFF1A8',d:'#C9971A',s:'#8A8D91',S:'#5F6266',l:'#B8BBBF',b:'#0E2418',G:'#5DFF6A',w:'#FFFFFF',r:'#D8452F',e:'#5DBB3F',E:'#3E8A2A',o:'#8B5A2B',O:'#5C3A1E',x:'#2E3036'};
+var ICONS = {
+  screen:['................','.kkkkkkkkkkkkkk.','.klllllllllllsk.','.klbbbbbbbbbbsk.','.klbGbbbbbbbbsk.','.klbbGbbbbbbbsk.','.klbGbbGGGbbbsk.','.klbbbbbbbbbbsk.','.klbbbbbbbbbbsk.','.ksssssssssssSk.','.kkkkkkkkkkkkkk.','......kSSk......','......kSSk......','....kkkkkkkk....','....kssssssk....','....kkkkkkkk....'],
+  coin:['................','.....kkkkkk.....','...kkgggggdkk...','..khhggggggddk..','..khgggggggddk..','.khggggkkggggdk.','.khgggkddkgggdk.','.kggggkddkgggdk.','.kggggkddkgggdk.','.kggggkddkgggdk.','.kgggggkkggggdk.','..kggggggggddk..','..kddggggggddk..','...kkddddddkk...','.....kkkkkk.....','................'],
+  vault:['................','.kkkkkkkkkkkkkk.','.kllllllllllllk.','.klsssssssssssk.','.klsSSSSSSSSssk.','.klsSkkkkkkSssk.','.klsSkggggkSsSk.','.klsSkghhdkSsSk.','.klsSkgddgkSsSk.','.klsSkkkkkkSsSk.','.klsSSSSSSSSssk.','.klsssssssssssk.','.kSSSSSSSSSSSSk.','.kkkkkkkkkkkkkk.','..kk........kk..','................'],
+  key:['................','................','..kkkkk.........','.khhggdk........','khgkkkgdk.......','kgk...kgk.......','kgk...kgk.......','kgdkkkgdkkkkkkk.','.kgggggggggggddk','..kkkkkgdkkgdkkk','.......kgdkkgdk.','.......kkkk.kkk.','................','................','................','................'],
+  check:['..........','.kkkkkkkk.','.keeeeeeek','.keeeeeEek','.keeeeEEek','.kEeeEEeek','.keEEEeeek','.keeEeeeek','.kkkkkkkkk','..........'],
+  lock:['..........','...kkkk...','..klllsk..','..kl..sk..','.kkkkkkkk.','.kgggggdk.','.kgggkgdk.','.kggkkgdk.','.kdddddk..','.kkkkkkkk.'],
+  stack:['..........','.kkkkkkk..','.kgggggdk.','.kkkkkkkk.','..kgggggdk','..kkkkkkkk','.kgggggdk.','.kkkkkkkk.','..........','..........'],
+  info:['..........','.kkkkkkkk.','.kllllllk.','.klkkllsk.','.klllllsk.','.klkkllsk.','.klkkllsk.','.kssssssk.','.kkkkkkkk.','..........']
+};
+function pxSVG(map){
+  var h = map.length, w = map[0].length, out = '';
+  for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) { var c = map[y][x]; if (c !== '.' && PAL[c]) out += '<rect x="' + x + '" y="' + y + '" width="1.02" height="1.02" fill="' + PAL[c] + '"/>'; }
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" shape-rendering="crispEdges" aria-hidden="true">' + out + '</svg>';
+}
+function pxURL(map, pal){
+  var c = document.createElement('canvas'); c.width = map[0].length; c.height = map.length; var x = c.getContext('2d');
+  for (var j = 0; j < map.length; j++) for (var i = 0; i < map[j].length; i++) { var k = map[j][i]; if (pal[k]) { x.fillStyle = pal[k]; x.fillRect(i, j, 1, 1); } }
+  return c.toDataURL('image/png');
+}
+document.querySelectorAll('[data-icon]').forEach(function(n){ var m = ICONS[n.getAttribute('data-icon')]; if (m) n.innerHTML = pxSVG(m); });
+document.querySelectorAll('.rules .ic svg').forEach(function(s){ s.setAttribute('width', '40'); s.setAttribute('height', '40'); });
+
+/* ---------- logo mark: isometric grass block with a coin slot ---------- */
+var LOGO_SVG = '<svg viewBox="0 -6 32 38" shape-rendering="crispEdges" aria-hidden="true">' +
+  '<polygon points="16,2 30,9 16,16 2,9" fill="#5DBB3F"/>' +
+  '<polygon points="16,3 28,9 16,15 4,9" fill="#6CC94C"/>' +
+  '<rect x="8" y="8" width="2" height="1" fill="#7ED957"/><rect x="20" y="11" width="2" height="1" fill="#4FA334"/><rect x="22" y="7" width="2" height="1" fill="#7ED957"/><rect x="12" y="12" width="2" height="1" fill="#4FA334"/>' +
+  '<polygon points="2,9 16,16 16,30 2,23" fill="#8B5A2B"/>' +
+  '<polygon points="16,16 30,9 30,23 16,30" fill="#5C3A1E"/>' +
+  '<polygon points="2,9 16,16 16,19 13,18 11,19 8,16 5,15 2,13" fill="#4FA334"/>' +
+  '<polygon points="16,16 30,9 30,12 27,14 25,13 22,16 19,17 16,19" fill="#3E8A2A"/>' +
+  '<rect x="5" y="19" width="2" height="2" fill="#6E4520"/><rect x="10" y="23" width="2" height="2" fill="#A06A35"/><rect x="7" y="25" width="2" height="1" fill="#6E4520"/><rect x="13" y="21" width="1" height="2" fill="#A06A35"/>' +
+  '<rect x="20" y="22" width="2" height="2" fill="#4A2E17"/><rect x="25" y="18" width="2" height="2" fill="#734A26"/><rect x="23" y="25" width="2" height="1" fill="#4A2E17"/>' +
+  '<polygon points="11,7 21,12 19,13 9,8" fill="#121212"/>' +
+  '<polygon points="12,7.5 19.5,11.25 19.5,6.25 18,3.5 16,2 13.5,1.5 12,2.5" fill="#FFD24A"/>' +
+  '<polygon points="17.5,10.25 19.5,11.25 19.5,6.25 18,3.5 17.5,4" fill="#C9971A"/>' +
+  '<polygon points="13.5,3 15,2.6 15,8.5 13.5,7.8" fill="#FFF1A8"/>' +
+  '<polygon points="2,9 16,2 30,9 30,23 16,30 2,23" fill="none" stroke="#121212" stroke-width="1"/>' +
+  '<path d="M2 9L16 16L30 9M16 16V30" fill="none" stroke="#121212" stroke-width=".6" opacity=".5"/>' +
+  '</svg>';
+var LOGO_URL = 'data:image/svg+xml,' + encodeURIComponent(LOGO_SVG);
+function safeImgSrc(v){ v = String(v || '').trim(); if (!v) return ''; if (/^(https?:)?\/\//i.test(v) || /^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+\/=]+$/.test(v) || /^[\w.\-]+\.(png|jpe?g|gif|webp|svg)$/i.test(v)) return v; return ''; }
+var LOGO_IMG = safeImgSrc(C.LOGO);
+document.querySelectorAll('.logo-slot').forEach(function(s){
+  if (LOGO_IMG) { var i = el('img'); i.src = LOGO_IMG; i.alt = ''; i.style.width = '100%'; i.style.height = '100%'; i.style.objectFit = 'contain'; s.appendChild(i); }
+  else s.innerHTML = LOGO_SVG;
+});
+try { $('favicon').href = LOGO_IMG || LOGO_URL; } catch (e) {}
+
+/* ---------- sound ---------- */
+var AC = null, soundOn = store('craft-snd') === '1';
+var SND_ON = '<svg viewBox="0 0 12 12" shape-rendering="crispEdges"><path fill="#fff" d="M1 4h2v4h-2zM3 4h1v-1h1v-1h1v8h-1v-1h-1v-1h-1z"/><path fill="#7ED957" d="M8 3h1v1h-1zM9 4h1v4h-1zM8 8h1v1h-1zM7 5h1v2h-1z"/></svg>';
+var SND_OFF = '<svg viewBox="0 0 12 12" shape-rendering="crispEdges"><path fill="#fff" d="M1 4h2v4h-2zM3 4h1v-1h1v-1h1v8h-1v-1h-1v-1h-1z"/><path fill="#FF5A4E" d="M8 4h1v1h-1zM10 4h1v1h-1zM9 5h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1z"/></svg>';
+function paintSnd(){ var b = $('sndBtn'); b.innerHTML = soundOn ? SND_ON : SND_OFF; b.setAttribute('aria-pressed', soundOn ? 'true' : 'false'); b.setAttribute('aria-label', soundOn ? 'Sound on. Turn sound off' : 'Sound off. Turn sound on'); }
+function pop(f){
+  if (!soundOn) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    var t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain(); f = f || 620;
+    o.type = 'square'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * 0.45, t + 0.09);
+    g.gain.setValueAtTime(0.05, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+    o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + 0.13);
+  } catch (e) {}
+}
+$('sndBtn').addEventListener('click', function(){ soundOn = !soundOn; store('craft-snd', soundOn ? '1' : '0'); paintSnd(); pop(880); });
+paintSnd();
+document.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('.btn,.chip,.slot'); if (b) pop(b.classList.contains('btn-green') ? 760 : 620); });
+
+function toast(msg){ var t = el('div', 'toast', msg); t.setAttribute('role', 'status'); document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 1500); }
+function copyText(txt){
+  function fb(){ try { var ta = el('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('COPIED'); } catch (e) { toast('COPY FAILED'); } }
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(function(){ toast('COPIED'); }, fb); return; } } catch (e) {}
+  fb();
+}
+
+/* ---------- textures: generated pixel tiles ---------- */
+var TEX = {
+  grass:[['#5DBB3F',5],['#4FA334',3],['#6CC94C',2]],
+  dirt:[['#8B5A2B',6],['#7E5026',3],['#96632F',2],['#6E4520',1]],
+  dirt2:[['#6F4622',6],['#653F1E',3],['#7A4E27',2],['#57361A',1]],
+  stone:[['#7D8084',6],['#74777B',3],['#878A8E',2],['#6A6D71',1]],
+  stone2:[['#55585D',6],['#4E5156',3],['#5E6166',2],['#46494D',1]],
+  deep:[['#2B2D33',7],['#26282D',3],['#31333A',2]],
+  bed:[['#151517',6],['#111113',3],['#1C1C1F',2],['#232326',1]]
+};
+function pick(list, r){ var tot = 0, i; for (i = 0; i < list.length; i++) tot += list[i][1]; var v = r() * tot; for (i = 0; i < list.length; i++) { v -= list[i][1]; if (v <= 0) return list[i][0]; } return list[0][0]; }
+function tile(name, seed){
+  var Z = 48, c = document.createElement('canvas'); c.width = c.height = Z; var x = c.getContext('2d'), r = rng(seed), L = TEX[name];
+  for (var j = 0; j < Z; j++) for (var i = 0; i < Z; i++) { x.fillStyle = pick(L, r); x.fillRect(i, j, 1, 1); }
+  if (name === 'deep') { for (var o = 0; o < 3; o++) { var ox = 2 + Math.floor(r() * 42), oy = 2 + Math.floor(r() * 42); x.fillStyle = '#C9971A'; x.fillRect(ox, oy, 2, 2); x.fillStyle = '#FFD24A'; x.fillRect(ox, oy, 1, 1); if (r() < .6) { x.fillStyle = '#C9971A'; x.fillRect(ox + 2, oy + 1, 1, 2); } } }
+  return c.toDataURL();
+}
+function edgeTile(from, seed){
+  var c = document.createElement('canvas'); c.width = 16; c.height = 4; var x = c.getContext('2d'), r = rng(seed), L = TEX[from];
+  for (var i = 0; i < 16; i++) { var d = 1 + Math.floor(r() * 3.2); if (from === 'grass') d = 1 + Math.floor(r() * 2.6); for (var j = 0; j < d; j++) { x.fillStyle = pick(L, r); x.fillRect(i, j, 1, 1); } }
+  return c.toDataURL();
+}
+function hexRGB(h){ return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16), parseInt(h.substr(5, 2), 16)]; }
+function fullTex(sec, name, seed){
+  var b = sec.getBoundingClientRect(), w = Math.max(16, Math.ceil(b.width / 6)), h = Math.max(16, Math.ceil(b.height / 6));
+  var c = document.createElement('canvas'); c.width = w; c.height = h; var x = c.getContext('2d'), img = x.createImageData(w, h), d = img.data, r = rng(seed), L = TEX[name];
+  var cache = {}; L.forEach(function(e){ cache[e[0]] = hexRGB(e[0]); });
+  for (var i = 0; i < w * h; i++) { var col = cache[pick(L, r)]; d[i * 4] = col[0]; d[i * 4 + 1] = col[1]; d[i * 4 + 2] = col[2]; d[i * 4 + 3] = 255; }
+  x.putImageData(img, 0, 0);
+  if (name === 'deep' || name === 'stone2') {
+    var n = Math.round(w * h / (name === 'deep' ? 420 : 1600));
+    for (var o = 0; o < n; o++) { var ox = Math.floor(r() * w), oy = Math.floor(r() * h), gold = name === 'deep';
+      x.fillStyle = gold ? '#C9971A' : '#3a3d42'; x.fillRect(ox, oy, 2, 2); if (r() < .6) x.fillRect(ox + 2, oy + 1, 1, 2); if (r() < .5) x.fillRect(ox - 1, oy + 2, 2, 1);
+      x.fillStyle = gold ? '#FFD24A' : '#6f7378'; x.fillRect(ox, oy, 1, 1); }
+  }
+  if (name === 'dirt' || name === 'dirt2') {
+    for (var q = 0; q < Math.round(w * h / 900); q++) { var px0 = Math.floor(r() * w), py0 = Math.floor(r() * h); x.fillStyle = '#7D8084'; x.fillRect(px0, py0, 2, 1); x.fillStyle = '#5F6266'; x.fillRect(px0, py0 + 1, 2, 1); }
+  }
+  sec.style.backgroundImage = 'url(' + c.toDataURL() + ')';
+  sec.style.backgroundSize = (w * 6) + 'px ' + (h * 6) + 'px';
+  sec.style.backgroundRepeat = 'no-repeat';
+}
+function paintTex(){
+  try {
+    document.querySelectorAll('[data-tex]').forEach(function(s, n){
+      fullTex(s, s.getAttribute('data-tex'), 99 + n * 31);
+      var e = s.getAttribute('data-edge'); if (e) s.style.setProperty('--edge', 'url(' + edgeTile(e, 7 + n * 13) + ')');
+    });
+  } catch (e) {}
+}
+paintTex();
+var texW = innerWidth; addEventListener('resize', function(){ clearTimeout(paintTex.t); paintTex.t = setTimeout(function(){ if (Math.abs(innerWidth - texW) > 40) { texW = innerWidth; paintTex(); } }, 250); });
+if ('ResizeObserver' in window) { var texH = {}; var ro = new ResizeObserver(function(es){ es.forEach(function(en){ var k = en.target.id || en.target.className, hh = Math.round(en.contentRect.height); if (texH[k] && Math.abs(texH[k] - hh) > 30) fullTex(en.target, en.target.getAttribute('data-tex'), 99); texH[k] = hh; }); }); document.querySelectorAll('[data-tex]').forEach(function(s){ ro.observe(s); }); }
+
+/* ---------- sky + ground ---------- */
+(function(){
+  var cv = $('sky'), ctx = cv.getContext('2d'), P = 6, W = 0, H = 0, clouds = [], r = rng(4242), last = 0;
+  function makeClouds(){
+    clouds = []; var n = Math.max(4, Math.round(W / 46));
+    for (var i = 0; i < n; i++) {
+      var w = 10 + Math.floor(r() * 18), h = 3 + Math.floor(r() * 3);
+      clouds.push({x: r() * (W + 40) - 20, y: (i % 3 === 2) ? H - 22 - Math.floor(r() * 4) : 2 + Math.floor(r() * 5), w: w, h: h, v: 0.6 + r() * 0.9, bumps: [Math.floor(r() * w * 0.5), 2 + Math.floor(r() * 5), Math.floor(w * 0.45 + r() * w * 0.3), 2 + Math.floor(r() * 4)]});
+    }
+  }
+  function size(){ var b = cv.parentNode.getBoundingClientRect(); W = Math.ceil(b.width / P); H = Math.ceil(b.height / P); cv.width = W; cv.height = H; makeClouds(); draw(0); }
+  function draw(t){
+    var bands = ['#7CC9FC', '#86CEFD', '#8FD3FF', '#9BD9FF', '#A9DFFF', '#B7E5FF'];
+    for (var i = 0; i < bands.length; i++) { ctx.fillStyle = bands[i]; ctx.fillRect(0, Math.floor(H * i / bands.length), W, Math.ceil(H / bands.length) + 1); }
+    for (var c = 0; c < clouds.length; c++) {
+      var k = clouds[c], x = Math.floor(((k.x + t * k.v * 0.0016) % (W + 60)) - 30), y = k.y;
+      ctx.globalAlpha = 0.72; ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x, y, k.w, k.h);
+      ctx.fillRect(x + k.bumps[0], y - 2, Math.min(k.bumps[1] + 4, k.w), 2);
+      ctx.fillRect(x + k.bumps[2], y - 1, Math.min(k.bumps[3] + 3, k.w - k.bumps[2]), 1);
+      ctx.fillStyle = '#E4F3FF'; ctx.fillRect(x, y + k.h - 1, k.w, 1); ctx.globalAlpha = 1;
+    }
+  }
+  function loop(t){ if (t - last > 66) { draw(t); last = t; } requestAnimationFrame(loop); }
+  size(); window.addEventListener('resize', function(){ clearTimeout(size.t); size.t = setTimeout(size, 120); });
+  if (!REDUCED) requestAnimationFrame(loop);
+
+  var g = $('groundCv'), gx = g.getContext('2d');
+  function ground(){
+    var b = g.getBoundingClientRect(), w = Math.ceil(b.width / P), h = Math.ceil(b.height / P), rr = rng(77);
+    g.width = w; g.height = h;
+    var T = 4;
+    for (var i = 0; i < w; i++) {
+      var gd = 3 + Math.floor(rr() * 2.4);
+      for (var j = 0; j < h - T; j++) {
+        var col;
+        if (j === 0) col = rr() < 0.3 ? '#7ED957' : '#6CC94C';
+        else if (j < gd) col = pick(TEX.grass, rr);
+        else col = pick(TEX.dirt, rr);
+        gx.fillStyle = col; gx.fillRect(i, j + T, 1, 1);
+      }
+    }
+    var tr = rng(909);
+    for (var x = 2; x < w - 2; x += 3 + Math.floor(tr() * 9)) {
+      var kind = tr();
+      if (kind < 0.62) { gx.fillStyle = tr() < 0.5 ? '#4FA334' : '#6CC94C'; gx.fillRect(x, T - 1, 1, 1); if (tr() < 0.6) gx.fillRect(x + 1, T - 2, 1, 2); if (tr() < 0.4) gx.fillRect(x - 1, T - 1, 1, 1); }
+      else if (kind < 0.82) { gx.fillStyle = '#3E8A2A'; gx.fillRect(x, T - 2, 1, 2); gx.fillStyle = tr() < 0.5 ? '#FFD24A' : '#FF5A4E'; gx.fillRect(x, T - 3, 1, 1); gx.fillStyle = '#FFF1A8'; if (tr() < 0.3) gx.fillRect(x, T - 3, 1, 1); }
+    }
+  }
+  ground(); window.addEventListener('resize', function(){ clearTimeout(ground.t); ground.t = setTimeout(ground, 120); });
+})();
+
+/* ---------- particles ---------- */
+var FX = (function(){
+  var cv = $('fx'), ctx = cv.getContext('2d'), parts = [], run = false;
+  function size(){ cv.width = innerWidth; cv.height = innerHeight; }
+  size(); addEventListener('resize', size);
+  function step(){
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    for (var i = parts.length - 1; i >= 0; i--) {
+      var p = parts[i]; p.vy += 0.42; p.x += p.vx; p.y += p.vy; p.life--;
+      if (p.life <= 0 || p.y > cv.height + 20) { parts.splice(i, 1); continue; }
+      ctx.globalAlpha = Math.min(1, p.life / 18); ctx.fillStyle = p.c; ctx.fillRect(Math.round(p.x), Math.round(p.y), p.s, p.s);
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(Math.round(p.x) + p.s - 2, Math.round(p.y) + p.s - 2, 2, 2);
+    }
+    ctx.globalAlpha = 1;
+    if (parts.length) requestAnimationFrame(step); else run = false;
+  }
+  return {burst: function(x, y, cols){
+    if (REDUCED) return;
+    for (var i = 0; i < 22; i++) parts.push({x: x, y: y, vx: (Math.random() - 0.5) * 9, vy: -3 - Math.random() * 7, s: 6 + Math.floor(Math.random() * 3) * 3, c: cols[i % cols.length], life: 38 + Math.random() * 22});
+    if (!run) { run = true; requestAnimationFrame(step); }
+  }};
+})();
+
+/* ---------- rack ---------- */
+var THRESH = [1, 7, 30, 90, 180, 365, 730, 1825], TLBL = ['1D', '1W', '1M', '3M', '6M', '1Y', '2Y', '5Y'];
+var Rack = (function(){
+  var cv = $('rack'), ctx = cv.getContext('2d'), W = 76, H = 160, N = 8, UY = 14, UH = 14, X0 = 11, UW = 54;
+  var stat = document.createElement('canvas'); stat.width = W; stat.height = H; var sx = stat.getContext('2d'), r = rng(31337);
+  var lit = 0, target = 0, flash = [], last = 0, stepT = 0, scale = 3, visible = true;
+  function px(c, x, y, w, h){ sx.fillStyle = c; sx.fillRect(x, y, w || 1, h || 1); }
+  // grass cap
+  for (var i = 6; i < 70; i++) {
+    for (var j = 0; j < 12; j++) {
+      var dr = 4 + ((i * 7 + 3) % 5 === 0 ? 2 : (i % 3 === 0 ? 1 : 0));
+      var c = j === 0 ? (r() < 0.35 ? '#7ED957' : '#6CC94C') : j < dr ? pick(TEX.grass, r) : pick(TEX.dirt, r);
+      if (j === 11) c = '#4A2E17';
+      px(c, i, j);
+    }
+  }
+  px('#121212', 6, 0, 1, 12); px('#121212', 69, 0, 1, 12); px('#121212', 6, 0, 64, 1);
+  // frame
+  for (var y = 12; y < 132; y++) for (var x = 7; x < 11; x++) px(x === 7 ? '#121212' : pick(TEX.stone, r), x, y);
+  for (y = 12; y < 132; y++) for (x = 65; x < 69; x++) px(x === 68 ? '#121212' : pick(TEX.stone, r), x, y);
+  for (y = 128; y < 132; y++) for (x = 7; x < 69; x++) px(y === 131 ? '#121212' : pick(TEX.stone, r), x, y);
+  px('#0b0b0c', 11, 12, 54, 116);
+  // floating island
+  for (y = 132; y < H; y++) {
+    var k = y - 132, hw = k < 4 ? 38 : Math.max(2, 38 - Math.floor((k - 3) * 1.45 + (r() * 2)));
+    for (x = 38 - hw; x < 38 + hw; x++) {
+      var cc = k === 0 ? (r() < 0.35 ? '#7ED957' : '#6CC94C') : k < 3 ? pick(TEX.grass, r) : (k < 5 && r() < 0.4) ? '#4FA334' : pick(TEX.dirt, r);
+      if (k > 10 && r() < 0.12) cc = pick(TEX.stone, r);
+      if (x === 38 - hw || x === 38 + hw - 1) cc = k < 3 ? '#3E8A2A' : '#4A2E17';
+      px(cc, x, y);
+    }
+  }
+  var unitY = function(idx){ return UY + idx * UH + 1; }; // idx 0 = top
+  function drawUnit(idx, on, t){
+    var y = unitY(idx), b = N - 1 - idx; // b = from bottom
+    var body = on ? '#30353E' : '#141518';
+    ctx.fillStyle = body; ctx.fillRect(X0, y, UW, UH - 1);
+    ctx.fillStyle = on ? '#454B55' : '#222327'; ctx.fillRect(X0, y, UW, 1);
+    ctx.fillStyle = '#08090a'; ctx.fillRect(X0, y + UH - 2, UW, 1);
+    ctx.fillStyle = on ? '#6B6F75' : '#2d2e32'; ctx.fillRect(X0 + 1, y + 2, 2, UH - 5);
+    var blink = Math.floor(t / 180 + b * 3.7);
+    var g1 = on && (blink % 5 !== 0), a1 = on && ((blink * 7 + b) % 3 === 0);
+    ctx.fillStyle = on ? (g1 ? '#5DFF6A' : '#1f6e2a') : '#1c1414'; ctx.fillRect(X0 + 5, y + 3, 2, 2);
+    ctx.fillStyle = on ? (a1 ? '#FFB627' : '#6b4a10') : '#1c1414'; ctx.fillRect(X0 + 5, y + 7, 2, 2);
+    for (var d = 0; d < 4; d++) {
+      var bx = X0 + 10 + d * 8;
+      ctx.fillStyle = on ? '#1E2126' : '#101113'; ctx.fillRect(bx, y + 2, 6, UH - 5);
+      ctx.fillStyle = on ? '#3A3F47' : '#18191c'; ctx.fillRect(bx, y + 2, 6, 1);
+      if (on && ((Math.floor(t / 90) + d * 5 + b * 11) % 7 < 2)) { ctx.fillStyle = '#5DFF6A'; ctx.fillRect(bx + 4, y + UH - 5, 1, 1); }
+    }
+    for (var v = 0; v < 5; v++) { ctx.fillStyle = on ? '#14161A' : '#0c0d0e'; ctx.fillRect(X0 + 44 + v * 2, y + 2, 1, UH - 5); }
+    if (on) { ctx.fillStyle = '#2f8a3c'; ctx.fillRect(X0 + 10, y + UH - 3, 32, 1); ctx.fillStyle = '#5DFF6A'; var sw = (Math.floor(t / 70) + b * 9) % 32; ctx.fillRect(X0 + 10 + sw, y + UH - 3, 3, 1); ctx.fillStyle = 'rgba(93,255,106,.10)'; ctx.fillRect(X0 + 44, y + 2, 10, UH - 5); }
+    else { ctx.fillStyle = '#4a1a1a'; ctx.fillRect(X0 + 5, y + 7, 1, 1); }
+    var fl = (flash[idx] || 0) - t; if (fl > 0 && visible) { ctx.globalAlpha = Math.min(1, fl / 320) * 0.85; ctx.fillStyle = '#E9FFE0'; ctx.fillRect(X0, y, UW, UH - 1); ctx.globalAlpha = 1; }
+  }
+  function draw(t){
+    ctx.clearRect(0, 0, W, H); ctx.drawImage(stat, 0, 0);
+    for (var i = 0; i < N; i++) drawUnit(i, (N - 1 - i) < lit, t);
+  }
+  function loop(t){
+    if (t - stepT > 120 && lit !== target) { var idx; if (lit < target) { lit++; idx = N - lit; } else { idx = N - lit; lit--; } flash[idx] = t + 320; stepT = t; paintLabels(); if (!visible) draw(t); }
+    if (visible && t - last > 60) { draw(t); last = t; }
+    requestAnimationFrame(loop);
+  }
+  var labels = [];
+  function buildLabels(){ var box = $('rackLabels'); box.textContent = ''; labels = []; for (var i = 0; i < N; i++) { var s = el('span', '', TLBL[N - 1 - i]); box.appendChild(s); labels.push(s); } }
+  function paintLabels(){ for (var i = 0; i < N; i++) { labels[i].style.top = ((unitY(i) + (UH - 1) / 2) * scale) + 'px'; labels[i].classList.toggle('on', (N - 1 - i) < lit); }
+    $('offSign').hidden = !(lit === 0 && target === 0);
+    cv.style.filter = lit > 0 ? 'drop-shadow(0 0 ' + (4 + lit * 2) + 'px rgba(93,255,106,' + (0.12 + lit * 0.04) + ')) drop-shadow(6px 8px 0 rgba(10,40,70,.18))' : 'drop-shadow(6px 8px 0 rgba(10,40,70,.18))';
+  }
+  function layout(){
+    var vw = innerWidth; scale = 3;
+    cv.style.width = (W * scale) + 'px'; cv.style.height = (H * scale) + 'px';
+    var wrap = $('rackWrap'); wrap.style.width = (W * scale) + 'px'; wrap.style.height = (H * scale) + 'px';
+    paintLabels();
+  }
+  buildLabels(); layout(); addEventListener('resize', layout);
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ visible = e[0].isIntersecting; }).observe(cv);
+  draw(0);
+  requestAnimationFrame(loop);
+  $('rackWrap').addEventListener('pointerdown', function(e){
+    FX.burst(e.clientX, e.clientY, ['#5DBB3F', '#3E8A2A', '#8B5A2B', '#5C3A1E', '#8A8D91', '#5DFF6A']);
+    pop(340 + Math.random() * 120);
+  });
+  return {set: function(days){ var n = 0; for (var i = 0; i < N; i++) if (days >= THRESH[i]) n = i + 1; target = n; if (REDUCED) { lit = n; paintLabels(); draw(0); } else paintLabels(); }};
+})();
+
+/* ---------- hosting math ---------- */
+var solPrice = 150, solLive = false, vol = 1000, shownDays = 0, tweenRaf = 0;
+function posToVol(p){ p = Number(p); if (p <= 0) return 0; var v = Math.pow(10, p * 5 / 1000); return v < 10 ? Math.round(v * 10) / 10 : v < 1000 ? Math.round(v) : Math.round(v / 10) * 10; }
+function volToPos(v){ return v <= 0 ? 0 : Math.max(1, Math.min(1000, Math.round(Math.log10(v) * 200))); }
+function setP(inp){ inp.style.setProperty('--p', (inp.value / 10) + '%'); }
+function solFmt(v){ return v < 10 ? fmt(v, v % 1 ? 1 : 0) : fmt(v); }
+function compute(){
+  var feeSol = vol * FEE / 100, usd = feeSol * solPrice, days = usd / HOST;
+  return {feeSol: feeSol, usd: usd, days: days};
+}
+function render(src){
+  var m = compute(), days = m.days;
+  $('heroVolV').textContent = solFmt(vol) + ' SOL volume';
+  $('meterVolV').textContent = solFmt(vol) + ' SOL';
+  $('heroVolNote').textContent = vol === 0 ? 'no volume, no fees, no hosting' : 'fees ' + fmt(m.feeSol, m.feeSol < 10 ? 2 : 1) + ' SOL at ' + FEE + '% (example)';
+  $('mFee').textContent = fmt(m.feeSol, m.feeSol < 10 ? 2 : 1) + ' SOL';
+  $('mUsd').textContent = '$' + fmt(m.usd);
+  $('mDays').textContent = fmt(Math.floor(days)) + ' days';
+  var off = days < 1;
+  $('mPaid').textContent = off ? 'SERVER OFFLINE' : dateIn(Math.floor(days));
+  $('mPaid').classList.toggle('off', off);
+  var mg = $('months').children, mo = Math.floor(days / 30.44);
+  for (var i = 0; i < mg.length; i++) mg[i].classList.toggle('on', i < mo);
+  $('monthsA').textContent = Math.min(mo, 24) + ' of 24 months';
+  $('monthsB').textContent = mo > 24 ? '+' + fmt(Math.floor((days - 730) / 365.25)) + ' more years' : '';
+  if (src !== 'hero') { $('heroVol').value = volToPos(vol); }
+  if (src !== 'meter') { $('meterVol').value = volToPos(vol); }
+  setP($('heroVol')); setP($('meterVol'));
+  Rack.set(days);
+  tweenDays(Math.floor(days));
+}
+function tweenDays(to){
+  cancelAnimationFrame(tweenRaf);
+  var from = shownDays, t0 = performance.now(), D = REDUCED ? 1 : 650;
+  function f(t){
+    var k = Math.min(1, (t - t0) / D), v = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+    shownDays = v;
+    var hp = $('heroPaid');
+    if (v < 1 && to < 1) { hp.textContent = 'OFFLINE'; hp.classList.add('off'); $('heroDays').textContent = '0 days of hosting'; }
+    else { hp.textContent = dateIn(v); hp.classList.remove('off'); $('heroDays').textContent = fmt(v) + ' days of hosting'; }
+    if (k < 1) tweenRaf = requestAnimationFrame(f);
+  }
+  tweenRaf = requestAnimationFrame(f);
+}
+(function(){ var mg = $('months'); for (var i = 0; i < 24; i++) mg.appendChild(el('i')); })();
+$('rateFee').textContent = FEE + '%';
+$('rateHost').textContent = '$' + fmt(HOST, 2) + '/day';
+function paintSol(){
+  $('rateSol').textContent = '$' + fmt(solPrice, solPrice < 100 ? 2 : 0);
+  $('rateSolSrc').textContent = solLive ? 'live price' : 'fallback price, live feed unavailable';
+  $('oneSol').textContent = 'Example rate: 1 SOL buys about ' + fmt(solPrice / HOST) + ' days of a mid-size server at $' + fmt(HOST, 2) + '/day.';
+}
+paintSol();
+['heroVol', 'meterVol'].forEach(function(id){
+  $(id).addEventListener('input', function(){ vol = posToVol(this.value); render(id === 'heroVol' ? 'hero' : 'meter'); });
+});
+document.querySelectorAll('#presets [data-v]').forEach(function(b){ b.addEventListener('click', function(){ vol = Number(b.getAttribute('data-v')); render(); }); });
+render();
+(function(){
+  function done(p){ if (p > 0 && isFinite(p)) { solPrice = p; solLive = true; paintSol(); render(); } }
+  try {
+    var ctl = new AbortController(); setTimeout(function(){ ctl.abort(); }, 6000);
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd', {signal: ctl.signal}).then(function(r){ if (!r.ok) throw 0; return r.json(); })
+      .then(function(j){ done(Number(j && j.solana && j.solana.usd)); })
+      .catch(function(){
+        fetch('https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT').then(function(r){ if (!r.ok) throw 0; return r.json(); }).then(function(j){ done(Number(j && j.price)); }).catch(function(){});
+      });
+  } catch (e) {}
+})();
+
+/* ---------- hotbar ---------- */
+(function(){
+  var slots = document.querySelectorAll('#hotbar .slot'), steps = document.querySelectorAll('#steps .step'), cur = 0, auto = true, timer;
+  function sel(i){ cur = i; slots.forEach(function(s, n){ s.classList.toggle('sel', n === i); s.setAttribute('aria-selected', n === i ? 'true' : 'false'); }); steps.forEach(function(s, n){ s.classList.toggle('sel', n === i); }); }
+  slots.forEach(function(s, n){ s.addEventListener('click', function(){ auto = false; sel(n); }); s.addEventListener('mouseenter', function(){ auto = false; sel(n); }); });
+  steps.forEach(function(s, n){ s.addEventListener('mouseenter', function(){ auto = false; sel(n); }); });
+  document.addEventListener('keydown', function(e){ var t = e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return; if (/^[1-4]$/.test(e.key)) { auto = false; sel(Number(e.key) - 1); } });
+  timer = setInterval(function(){ if (auto && !REDUCED) sel((cur + 1) % 4); }, 2600);
+})();
+
+/* ---------- MOTD rendering (safe: textContent only) ---------- */
+var MC = {'0':'#000000','1':'#0000AA','2':'#00AA00','3':'#00AAAA','4':'#AA0000','5':'#AA00AA','6':'#FFAA00','7':'#AAAAAA','8':'#555555','9':'#5555FF','a':'#55FF55','b':'#55FFFF','c':'#FF5555','d':'#FF55FF','e':'#FFFF55','f':'#FFFFFF'};
+function fresh(){ return {c: null, b: 0, i: 0, u: 0, m: 0, k: 0}; }
+function renderLine(row, s, mark){
+  s = String(s).replace(/\s+$/, '').replace(/^\s+/, '');
+  var st = fresh(), buf = '';
+  function span(text, extra){
+    var sp = document.createElement('span'); sp.textContent = text;
+    if (st.c) sp.style.color = st.c; if (st.b) sp.style.fontWeight = '700'; if (st.i) sp.style.fontStyle = 'italic';
+    var dec = []; if (st.u) dec.push('underline'); if (st.m) dec.push('line-through'); if (dec.length) sp.style.textDecoration = dec.join(' ');
+    if (st.k) { sp.className = 'obf'; sp.setAttribute('data-len', String(text.length)); }
+    if (extra) sp.classList.add(extra);
+    row.appendChild(sp);
+  }
+  function flush(){
+    if (!buf) return;
+    if (mark && buf.indexOf(mark) >= 0) { var p = buf.split(mark); for (var q = 0; q < p.length; q++) { if (p[q]) span(p[q]); if (q < p.length - 1) span(mark, 'mark-code'); } }
+    else span(buf);
+    buf = '';
+  }
+  for (var i = 0; i < s.length; i++) {
+    var ch = s.charAt(i);
+    if (ch === SECT && i + 1 < s.length) {
+      var code = s.charAt(i + 1).toLowerCase(); flush();
+      if (code === 'x' && /^(\u00a7[0-9a-f]){6}$/i.test(s.substr(i + 2, 12))) { var hx = '#'; for (var h = 0; h < 6; h++) hx += s.charAt(i + 3 + h * 2); st = fresh(); st.c = hx; i += 13; continue; }
+      if (MC[code]) { st = fresh(); st.c = MC[code]; }
+      else if (code === 'l') st.b = 1; else if (code === 'o') st.i = 1; else if (code === 'n') st.u = 1; else if (code === 'm') st.m = 1; else if (code === 'k') st.k = 1; else if (code === 'r') st = fresh();
+      i++; continue;
+    }
+    if (ch === '\n') { flush(); continue; }
+    buf += ch;
+  }
+  flush();
+}
+function trimRow(row){
+  var sp = row.children, i;
+  for (i = 0; i < sp.length; i++) { if (sp[i].classList.contains('obf')) break; var t = sp[i].textContent.replace(/^\s+/, ''); sp[i].textContent = t; if (t) break; }
+  for (i = sp.length - 1; i >= 0; i--) { if (sp[i].classList.contains('obf')) break; var u = sp[i].textContent.replace(/\s+$/, ''); sp[i].textContent = u; if (u) break; }
+}
+function renderMotd(box, motd){
+  box.textContent = '';
+  var lines = [];
+  if (motd && Array.isArray(motd.raw) && motd.raw.length) lines = motd.raw;
+  else if (motd && Array.isArray(motd.clean) && motd.clean.length) lines = motd.clean;
+  if (lines.length === 1 && String(lines[0]).indexOf('\n') >= 0) lines = String(lines[0]).split('\n');
+  lines = lines.slice(0, 2).map(String);
+  if (!lines.length || !lines.join('').trim()) { var r0 = el('div', 'motd-line', '(no MOTD)'); r0.style.color = '#555'; box.appendChild(r0); return; }
+  lines.forEach(function(l){ var row = el('div', 'motd-line'); renderLine(row, l); trimRow(row); box.appendChild(row); });
+}
+setInterval(function(){
+  var A = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ0123456789#$%&@';
+  document.querySelectorAll('.obf').forEach(function(s){ var n = Number(s.getAttribute('data-len')) || 4, o = ''; for (var i = 0; i < n; i++) o += A.charAt(Math.floor(Math.random() * A.length)); s.textContent = o; });
+}, 90);
+renderLine($('mockL1'), SECT + 'a' + SECT + 'lYour Server ' + SECT + '7| ' + SECT + 'eSurvival 1.21 ' + SECT + '7| ' + SECT + 'bfriendly crew');
+renderLine($('mockL2'), SECT + '7join the discord ' + SECT + '8- ' + SECT + '6craftpad-7f3a', 'craftpad-7f3a');
+renderLine($('mockL3'), SECT + 'cPvP ' + SECT + '7factions ' + SECT + 'f| ' + SECT + 'enew map');
+
+/* ---------- hashing ---------- */
+function sha256js(ascii){
+  function rr(v, a){ return (v >>> a) | (v << (32 - a)); }
+  var mp = Math.pow, maxWord = mp(2, 32), result = '', words = [], bitLen = ascii.length * 8, hash = [], k = [], pc = 0, comp = {}, i, j;
+  for (var cand = 2; pc < 64; cand++) { if (!comp[cand]) { for (i = 0; i < 313; i += cand) comp[i] = cand; hash[pc] = (mp(cand, .5) * maxWord) | 0; k[pc++] = (mp(cand, 1 / 3) * maxWord) | 0; } }
+  hash = hash.slice(0, 8);
+  ascii += '\x80'; while (ascii.length % 64 - 56) ascii += '\x00';
+  for (i = 0; i < ascii.length; i++) { j = ascii.charCodeAt(i); if (j >> 8) return ''; words[i >> 2] |= j << ((3 - i) % 4) * 8; }
+  words[words.length] = ((bitLen / maxWord) | 0); words[words.length] = bitLen;
+  for (j = 0; j < words.length;) {
+    var w = words.slice(j, j += 16), old = hash; hash = hash.slice(0, 8);
+    for (i = 0; i < 64; i++) {
+      var w15 = w[i - 15], w2 = w[i - 2], a = hash[0], e = hash[4];
+      var t1 = hash[7] + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & hash[5]) ^ ((~e) & hash[6])) + k[i] + (w[i] = (i < 16) ? w[i] : (w[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0);
+      var t2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+      hash = [(t1 + t2) | 0].concat(hash); hash[4] = (hash[4] + t1) | 0;
+    }
+    for (i = 0; i < 8; i++) hash[i] = (hash[i] + old[i]) | 0;
+  }
+  for (i = 0; i < 8; i++) for (j = 3; j + 1; j--) { var bb = (hash[i] >> (j * 8)) & 255; result += ((bb < 16) ? 0 : '') + bb.toString(16); }
+  return result;
+}
+function sha256hex(str){
+  try {
+    if (window.crypto && crypto.subtle && crypto.subtle.digest && window.TextEncoder) {
+      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function(b){ return Array.prototype.map.call(new Uint8Array(b), function(x){ return ('0' + x.toString(16)).slice(-2); }).join(''); }).catch(function(){ return sha256js(str); });
+    }
+  } catch (e) {}
+  return Promise.resolve(sha256js(str));
+}
+window.__craftHash = sha256hex;
+
+/* ---------- server ping ---------- */
+function normHost(v){
+  v = String(v || '').trim().toLowerCase().replace(/^[a-z]+:\/\//, '').replace(/[\/?#].*$/, '').replace(/\.$/, '');
+  v = v.replace(/:25565$/, '');
+  if (!/^[a-z0-9]([a-z0-9\-]{0,62}\.)*[a-z0-9\-]{1,63}(:\d{1,5})?$/.test(v)) return '';
+  if (v.indexOf('.') < 0 && !/^localhost/.test(v)) return '';
+  return v;
+}
+function deriveCoin(host){
+  var h = host.split(':')[0];
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(h)) { var o = h.split('.'); return {name: 'SERVER ' + o[2] + o[3], ticker: ('SRV' + o[3]).slice(0, 6)}; }
+  var parts = h.split('.').filter(Boolean);
+  if (parts.length > 1) parts.pop();
+  var pre = ['mc', 'play', 'www', 'join', 'hub', 'server', 'srv', 'go', 'eu', 'us', 'na', 'lobby', 'connect', 'mp'];
+  while (parts.length > 1 && pre.indexOf(parts[0]) >= 0) parts.shift();
+  var core = parts[parts.length - 1];
+  if (parts.length > 1 && ['co', 'com', 'net', 'org'].indexOf(core) >= 0) core = parts[parts.length - 2];
+  var name = (core || 'server').replace(/[^a-z0-9]/g, '').toUpperCase().slice(0, 18) || 'SERVER';
+  return {name: name, ticker: name.slice(0, 5)};
+}
+function stripCodes(s){ return String(s || '').replace(/\u00a7[0-9a-fk-orx]/gi, ''); }
+function safeIcon(v){ return (typeof v === 'string' && v.length < 200000 && /^data:image\/png;base64,[A-Za-z0-9+\/=\s]+$/.test(v)) ? v.replace(/\s/g, '') : ''; }
+function ping(host){
+  var ctl = ('AbortController' in window) ? new AbortController() : null, t0 = performance.now();
+  var to = setTimeout(function(){ if (ctl) ctl.abort(); }, 9000);
+  return fetch('https://api.mcsrvstat.us/3/' + host, ctl ? {signal: ctl.signal} : {})
+    .then(function(r){ if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+    .then(function(j){ clearTimeout(to); if (!j || typeof j !== 'object') throw new Error('bad json'); j.__rtt = Math.round(performance.now() - t0); return j; },
+          function(e){ clearTimeout(to); throw e; });
+}
+var SAMPLE_ICON_MAP = ['bbbbbbbbbbbbbbbb','bbbwwwbbbbbbbbbb','bbwwwwwbbbbbbbbb','bbbbbbbrrbbbbbbb','bbbbbbrrrrbbbbbb','bbbbbrrRRrrbbbbb','bbbbrrrrrrrrbbbb','bbbrrrrrrrrrrbbb','bbbbwwwwwwwwbbbb','bbbbwyywwoowbbbb','bbbbwyywwoowbbbb','bbbbwwwwwoowbbbb','eeeeeeeeeeeeeeee','EeEeeEeeeEeeEeeE','oooOoooooOoooooo','ooooooOooooooOoo'];
+var SAMPLE_PAL = {b:'#8FD3FF',w:'#F7F3EA',r:'#C0392B',R:'#E8604E',y:'#FFD24A',o:'#8B5A2B',O:'#5C3A1E',e:'#5DBB3F',E:'#3E8A2A'};
+function sampleData(){
+  return {online: true, hostname: 'blockhaven.net', version: '1.8 - 1.21', players: {online: 1284, max: 5000}, icon: pxURL(SAMPLE_ICON_MAP, SAMPLE_PAL),
+    motd: {raw: [SECT + 'a' + SECT + 'lBLOCKHAVEN ' + SECT + '7| ' + SECT + 'eSurvival ' + SECT + 'f+ ' + SECT + 'bSkyblock', SECT + '6' + SECT + 'lNEW SEASON ' + SECT + 'fstarts friday ' + SECT + '7- ' + SECT + 'dall versions welcome']}, __sample: true};
+}
+
+var cur = {host: '', code: '', sample: false, req: 0};
+function showLoading(host){
+  $('result').hidden = false; $('resGrid').hidden = true; $('resLoading').hidden = false;
+  $('loadingTxt').textContent = 'PINGING ' + host.toUpperCase() + '...';
+  $('resTag').className = 'tag tag-green'; $('resTag').innerHTML = '<span class="dot blink"></span>LIVE PING'; $('resNote').textContent = 'via api.mcsrvstat.us';
+}
+function fill(host, j){
+  var sample = !!j.__sample, coinHost = sample ? 'blockhaven.net' : host;
+  cur.host = coinHost; cur.sample = sample;
+  $('resLoading').hidden = true; $('resGrid').hidden = false;
+  if (sample) { $('resTag').className = 'tag tag-gold'; $('resTag').textContent = 'SAMPLE'; $('resNote').textContent = 'live ping unavailable here, showing a sample. blockhaven.net is made up.'; }
+  else { $('resTag').className = 'tag tag-green'; $('resTag').innerHTML = '<span class="dot blink"></span>LIVE PING'; $('resNote').textContent = 'real data from api.mcsrvstat.us in ' + (j.__rtt || 0) + 'ms'; }
+  var icon = safeIcon(j.icon);
+  $('srvIcon').src = icon || LOGO_URL; $('srvIcon').alt = icon ? 'Server icon' : 'No server icon, CraftPad block shown';
+  $('coinFace').src = icon || LOGO_URL;
+  $('srvHost').textContent = stripCodes(j.hostname || host).slice(0, 80) || host;
+  renderMotd($('srvMotd'), j.motd);
+  var on = !!j.online;
+  $('srvBars').setAttribute('data-s', on ? 'on' : 'off');
+  $('srvStatus').textContent = on ? 'ONLINE' : 'OFFLINE'; $('srvStatus').className = on ? 'st-on' : 'st-off';
+  var pl = j.players || {};
+  var ratio = on && Number(pl.max) > 0 ? Math.min(1, (Number(pl.online) || 0) / Number(pl.max)) : 0, pb = $('srvPbar'); pb.textContent = '';
+  for (var q = 0; q < 20; q++) { var cell = el('i'); if (on && q < Math.max(ratio > 0 ? 1 : 0, Math.round(ratio * 20))) cell.className = 'on'; pb.appendChild(cell); }
+  $('srvLoadPct').textContent = on && Number(pl.max) > 0 ? Math.round(ratio * 100) + '% FULL' : 'NO DATA';
+  $('srvPlayers').textContent = on && pl.max != null ? fmt(Number(pl.online) || 0) + ' / ' + fmt(Number(pl.max) || 0) : '--';
+  $('srvVersion').textContent = stripCodes(j.version || (j.protocol && j.protocol.name) || '--').slice(0, 40);
+  var foot = sample ? 'SAMPLE CARD. Paste an IP on the live site for real data.' : (j.ip ? 'IP ' + String(j.ip).replace(/[^0-9a-f.:]/gi, '') + (j.port ? ':' + Number(j.port) : '') + ' \u00b7 ' : '') + 'pinged ' + new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
+  $('srvFoot').textContent = foot;
+  var c = deriveCoin(coinHost);
+  var cl = $('srvCoinline'); cl.textContent = ''; cl.appendChild(el('span', 'r', 'NEXT 30 DAYS: UNFUNDED. ')); cl.appendChild(document.createTextNode('Its coin would pay this. ')); cl.appendChild(el('b', '', '1 SOL in fees = ~' + fmt(solPrice / HOST) + ' days.'));
+  var bd = $('billDays'); if (!bd.children.length) for (var dd = 0; dd < 30; dd++) bd.appendChild(el('i'));
+  $('billRate').textContent = fmt(HOST, 2);
+  $('coinName').textContent = c.name; $('coinTicker').textContent = '$' + c.ticker;
+  $('verifyOut').className = 'verify-out'; $('verifyOut').textContent = 'Checks the live MOTD for the code.';
+  $('claimCode').textContent = 'craftpad-....';
+  var hostOnly = coinHost;
+  sha256hex(hostOnly).then(function(hx){ if (cur.host !== hostOnly) return; cur.code = 'craftpad-' + hx.slice(0, 4); $('claimCode').textContent = cur.code; });
+  $('sheetBody').innerHTML = '';
+  var b1 = document.createTextNode('When the launcher goes live, this button creates '), b2 = el('b', '', '$' + c.ticker), b3 = document.createTextNode(' on pump.fun with 100% of its creator fee locked to the '), b4 = el('b', '', coinHost), b5 = document.createTextNode(' vault. Nothing launches from this page today.');
+  [b1, b2, b3, b4, b5].forEach(function(n){ $('sheetBody').appendChild(n); });
+}
+function run(raw, quiet){
+  var host = normHost(raw), err = $('ipErr');
+  if (!host) { err.hidden = false; err.textContent = 'That doesn\'t look like a server IP. Try something like play.example.net'; return; }
+  err.hidden = true; $('ipInput').value = host;
+  var id = ++cur.req; showLoading(host);
+  if (!quiet) try { history.replaceState(null, '', '?ip=' + encodeURIComponent(host) + location.hash); } catch (e) {}
+  ping(host).then(function(j){ if (id === cur.req) fill(host, j); })
+    .catch(function(){ if (id === cur.req) fill(host, sampleData()); });
+}
+$('ipForm').addEventListener('submit', function(e){ e.preventDefault(); run($('ipInput').value); });
+document.querySelectorAll('#chips .chip').forEach(function(c){ c.addEventListener('click', function(){ run(c.getAttribute('data-ip')); }); });
+$('copyCode').addEventListener('click', function(){ if (cur.code) copyText(cur.code); });
+$('verifyBtn').addEventListener('click', function(){
+  var out = $('verifyOut'), host = cur.host, code = cur.code, btn = this;
+  if (!host || !code) return;
+  out.className = 'verify-out'; out.textContent = 'Pinging ' + host + '...'; btn.disabled = true;
+  ping(host).then(function(j){
+    if (cur.host !== host) return;
+    var txt = ((j.motd && Array.isArray(j.motd.clean)) ? j.motd.clean.join(' ') : '') + ' ' + ((j.motd && Array.isArray(j.motd.raw)) ? stripCodes(j.motd.raw.join(' ')) : '');
+    out.textContent = '';
+    if (txt.toLowerCase().indexOf(code) >= 0) { out.appendChild(el('b', 'ok', 'CLAIMED \u2713')); out.appendChild(document.createTextNode(' code found in the live MOTD.')); }
+    else {
+      out.appendChild(el('b', 'no', 'NOT FOUND')); out.appendChild(document.createTextNode(j.online ? ' code is not in the MOTD yet.' : ' server is offline right now.'));
+      var exp = j.debug && Number(j.debug.cacheexpire); var left = exp ? Math.round(exp - Date.now() / 1000) : 0;
+      if (left > 0 && left < 3600) out.appendChild(document.createTextNode(' The ping API caches results; fresh check in ~' + left + 's.'));
+    }
+  }).catch(function(){
+    if (cur.host !== host) return;
+    out.textContent = ''; out.appendChild(el('b', 'no', 'PING UNAVAILABLE')); out.appendChild(document.createTextNode(' couldn\'t reach the ping API from here. Nothing was checked.'));
+  }).then(function(){ btn.disabled = false; });
+});
+
+/* ---------- launch sheet ---------- */
+var lastFocus = null;
+function openSheet(){ lastFocus = document.activeElement; $('sheet').hidden = false; $('sheetClose').focus(); }
+function closeSheet(){ $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('launchBtn').addEventListener('click', openSheet);
+document.querySelectorAll('#sheet [data-close]').forEach(function(n){ n.addEventListener('click', closeSheet); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !$('sheet').hidden) closeSheet(); });
+
+/* ---------- token ---------- */
+function safeUrl(u){ u = String(u || '').trim(); return /^https:\/\//i.test(u) ? u : ''; }
+(function(){
+  var ca = C.CA, buy = safeUrl(C.BUY), chart = safeUrl(C.CHART), x = safeUrl(C.X);
+  if (ca) { $('caText').textContent = ca; $('caText').classList.remove('empty'); $('caCopy').hidden = false; $('caCopy').addEventListener('click', function(){ copyText(ca); }); }
+  function link(a, url, soon){
+    if (url) { a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.removeAttribute('aria-disabled'); }
+    else { a.setAttribute('aria-disabled', 'true'); a.removeAttribute('href'); a.setAttribute('role', 'link'); a.setAttribute('title', soon); if (soon) { var s = a.querySelector('span'); if (s) s.textContent = soon; else a.textContent = soon; } }
+  }
+  link($('buyBtn'), buy, 'BUY AT LAUNCH'); link($('chartBtn'), chart, 'CHART AT LAUNCH'); link($('xBtn'), x, 'SOON');
+  if (buy) { $('navBuy').href = buy; $('navBuy').target = '_blank'; $('navBuy').rel = 'noopener'; }
+})();
+
+/* ---------- boot ---------- */
+var q = ''; try { q = new URLSearchParams(location.search).get('ip') || ''; } catch (e) {}
+run(q && normHost(q) ? q : 'mc.hypixel.net', true);
+})();
+</script>
+</body>
+</html>
